@@ -10,7 +10,7 @@ from typing import List, Optional, Dict, Any
 from contextlib import asynccontextmanager
 import uvicorn
 
-DATABASE_URL = "postgresql://postgres.emzlsfkojsttxnghgjwx:potbar-tugfuz-7zobCe@aws-1-eu-west-1.pooler.supabase.com:6543/postgres"
+DATABASE_URL = "postgresql://postgres.emzlsfkojsttxnghgjwx:potbar-tugfuz-7zobCe@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require"
 engine = create_engine(DATABASE_URL)
 
 class WorkoutSession(SQLModel, table=True):
