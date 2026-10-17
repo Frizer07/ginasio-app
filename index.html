@@ -20,7 +20,6 @@
             background: var(--bg); 
             color: var(--txt); 
             margin: 0; 
-            /* Correção da barra superior: Adiciona 20px de margem abaixo da notch do iPhone */
             padding: calc(env(safe-area-inset-top, 47px) + 20px) 20px 100px 20px; 
             -webkit-font-smoothing: antialiased; 
         }
@@ -48,21 +47,24 @@
         .set-weight { font-weight: 700; text-align: center; }
         .set-check { color: var(--sec); text-align: right; font-weight: bold;}
         
-        /* Correção da barra de navegação inferior */
+        /* CORREÇÃO DEFINITIVA DA BARRA INFERIOR */
         .bottom-nav { 
             position: fixed; bottom: 0; left: 0; right: 0; 
             background: rgba(28, 28, 30, 0.85); 
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
             display: flex; 
             border-top: 1px solid rgba(255,255,255,0.05); 
-            padding-bottom: env(safe-area-inset-bottom); /* Removido o limite extra que causava o espaço gigante */
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(60px + env(safe-area-inset-bottom)); /* Força a altura exata */
+            box-sizing: border-box; /* Impede o esticamento indesejado */
             z-index: 50; 
         }
         .nav-btn { 
             background: transparent; color: var(--mut); margin: 0; flex: 1; 
-            padding: 12px 0 8px 0; /* Padding reduzido para um aspeto slim e nativo */
+            height: 60px;
+            padding: 12px 0 0 0;
             border: none; font-size: 11px; font-weight: 600; 
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px;
         }
         .nav-btn.active { color: var(--primary); }
         .nav-icon { font-size: 22px; }
@@ -513,7 +515,8 @@
                 let duration = treinoAtual.duration_seconds || 0;
                 
                 if (!editandoTreinoId && workoutStartTime) { 
-                    duration = Math.floor((Date.now() - workoutStartTime) / 1000); clearInterval(workoutTimerInterval); 
+                    duration = Math.floor((Date.now() - workoutStartTime) / 1000); 
+                    clearInterval(workoutTimerInterval); 
                 }
                 
                 const dados = { routine_name: treinoAtual.routine_name, duration_seconds: duration, exercises: treinoAtual.exercises.map(ex => ({ name: ex.name, target_sets: ex.target_sets, sets: ex.sets })) };
@@ -561,16 +564,28 @@
             fecharDetalheTreino();
             if(await uiConfirm("Eliminar Treino?", "Este treino desaparecerá do teu histórico e gráficos.", "Eliminar", true)) {
                 let id = todosTreinosHistorico[idx].id;
-                try { await fetch(`${API_URL}/treinos/${id}`, { method: 'DELETE' }); showToast("Treino eliminado", "🗑️"); abrirHistorico(); } catch(e) { showToast("Erro de ligação", "❌"); }
+                try {
+                    await fetch(`${API_URL}/treinos/${id}`, { method: 'DELETE' });
+                    showToast("Treino eliminado", "🗑️");
+                    abrirHistorico(); 
+                } catch(e) { showToast("Erro de ligação", "❌"); }
             }
         }
 
         function editarTreinoHistorico(idx) {
-            fecharDetalheTreino(); let t = todosTreinosHistorico[idx]; editandoTreinoId = t.id; 
-            treinoAtual = JSON.parse(JSON.stringify(t)); exercicioAtualIndex = 0;
-            mostrarEcra('screen-live'); document.getElementById('liveTitle').innerText = "A Editar: " + t.routine_name;
+            fecharDetalheTreino();
+            let t = todosTreinosHistorico[idx];
+            editandoTreinoId = t.id; 
+            
+            treinoAtual = JSON.parse(JSON.stringify(t)); 
+            exercicioAtualIndex = 0;
+            
+            mostrarEcra('screen-live');
+            document.getElementById('liveTitle').innerText = "A Editar: " + t.routine_name;
+            
             if(workoutTimerInterval) clearInterval(workoutTimerInterval);
             document.getElementById('workoutTimerDisplay').innerText = formatTime(t.duration_seconds || 0);
+            
             renderizarLiveMode();
         }
 
