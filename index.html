@@ -2,9 +2,16 @@
 <html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- RESOLUÇÃO DA BARRA DO IPHONE: viewport-fit=cover -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    
+    <!-- RESOLUÇÃO DO ÍCONE DA APP NO ECRÃ PRINCIPAL -->
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2964/2964514.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2964/2964514.png">
+    
     <title>Meu Treino</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -215,7 +222,8 @@
     </nav>
 
     <script>
-        const API_URL = 'http://192.168.100.175:8000';
+        // RESOLUÇÃO DE DEPLOY NA NUVEM: API_URL VAZIO
+        const API_URL = ''; 
         let treinoAtual = null;
         let templateEmCriacao = [];
         let exercicioAtualIndex = 0; 
@@ -225,7 +233,6 @@
         let currentCalDate = new Date(); 
         let graficoChart = null;
 
-        // NOVO: Flag para sabermos se estamos a gravar um treino novo ou a editar um antigo
         let editandoTreinoId = null;
 
         let workoutStartTime = null;
@@ -277,7 +284,6 @@
         function closeUiConfirm(res) { document.getElementById('ui-confirm-modal').style.display = 'none'; if (uiConfirmResolve) { uiConfirmResolve(res); uiConfirmResolve = null; } }
 
         function guardarEstadoLocal() { 
-            // Só guardamos na RAM se não estivermos a editar o passado
             if (treinoAtual && !editandoTreinoId) localStorage.setItem('treinoEmCurso', JSON.stringify({ treino: treinoAtual, index: exercicioAtualIndex, startTime: workoutStartTime })); 
         }
         function verificarTreinoEmCurso() { const salvo = localStorage.getItem('treinoEmCurso'); document.getElementById('activeWorkoutBanner').style.display = salvo ? 'block' : 'none'; }
@@ -295,7 +301,6 @@
         
         async function cancelarTreinoSeguro() { 
             if(editandoTreinoId) {
-                // Se estamos só a editar o passado, sair é seguro, não apaga nada
                 editandoTreinoId = null; treinoAtual = null; voltarHome(); return;
             }
             if(await uiConfirm("Sair do Treino?", "Todo o progresso de hoje será perdido se saíres agora.", "Sair", true)) { localStorage.removeItem('treinoEmCurso'); treinoAtual = null; if(workoutTimerInterval) clearInterval(workoutTimerInterval); fecharRestTimer(); voltarHome(); } 
@@ -308,7 +313,6 @@
         }
         function voltarHome() { mostrarEcra('screen-home'); carregarTemplates(); }
 
-        // ======= TEMPLATES E CRIAR ROTINA =======
         async function carregarTemplates() {
             try {
                 const response = await fetch(`${API_URL}/templates/`); const templates = await response.json(); const lista = document.getElementById('templatesList'); lista.innerHTML = '';
@@ -361,7 +365,6 @@
             try { await fetch(`${API_URL}/templates/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: n, exercises: templateEmCriacao }) }); showToast("Rotina guardada", "✅"); voltarHome(); } catch (e) { showToast("Erro de ligação", "❌"); }
         }
 
-        // ======= GRÁFICOS =======
         async function iniciarEstatisticasTemplate(nome, exercicios) {
             mostrarEcra('screen-stats'); document.getElementById('statsTitle').innerText = nome;
             document.getElementById('statsExercicioSelect').innerHTML = exercicios.map(ex => { let exName = typeof ex === 'string' ? ex : ex.name; return `<option value="${exName}">${exName}</option>`; }).join('');
@@ -389,7 +392,6 @@
             graficoChart = new Chart(document.getElementById('progressChartCanvas').getContext('2d'), { type: 'line', data: { labels: dados.map(d => d.data), datasets: [{ label: met === 'volume' ? 'Volume' : 'Kg', data: dados.map(d => d.valor), borderColor: cor, backgroundColor: bg, borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: cor, pointRadius: 5, fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#2c2c2e', drawBorder: false } }, x: { grid: { display: false } } } } });
         }
 
-        // ======= LIVE MODE =======
         function tentarAutoSave() {
             const kgInput = document.getElementById('current_weight'); const repsInput = document.getElementById('current_reps');
             if (kgInput && repsInput) {
@@ -487,7 +489,6 @@
             try {
                 let duration = treinoAtual.duration_seconds || 0;
                 
-                // Se estamos a criar um NOVO treino, usa o relógio atual
                 if (!editandoTreinoId && workoutStartTime) { 
                     duration = Math.floor((Date.now() - workoutStartTime) / 1000); 
                     clearInterval(workoutTimerInterval); 
@@ -499,7 +500,6 @@
                     exercises: treinoAtual.exercises.map(ex => ({ name: ex.name, target_sets: ex.target_sets, sets: ex.sets })) 
                 };
                 
-                // Decide se é um POST (novo) ou PUT (atualização)
                 let endpoint = `${API_URL}/treinos/`;
                 let method = 'POST';
                 if (editandoTreinoId) {
@@ -512,7 +512,7 @@
                 
                 localStorage.removeItem('treinoEmCurso'); 
                 showToast(method === 'PUT' ? "Treino atualizado!" : "Treino finalizado!", "🎉"); 
-                editandoTreinoId = null; // Limpa o ID da memória
+                editandoTreinoId = null; 
                 voltarHome();
             } catch (error) { showToast("Sem ligação. Treino guardado localmente.", "📡"); }
         }
@@ -546,7 +546,6 @@
             } catch (e) { lista.innerHTML = '<p style="color: var(--danger); text-align:center;">Erro ao carregar histórico.</p>'; }
         }
 
-        // NOVO: Funções para apagar e editar pelo Histórico
         async function apagarTreinoHistorico(idx) {
             fecharDetalheTreino();
             if(await uiConfirm("Eliminar Treino?", "Este treino desaparecerá do teu histórico e gráficos.", "Eliminar", true)) {
@@ -562,16 +561,14 @@
         function editarTreinoHistorico(idx) {
             fecharDetalheTreino();
             let t = todosTreinosHistorico[idx];
-            editandoTreinoId = t.id; // Guardamos o ID do treino que estamos a editar
+            editandoTreinoId = t.id; 
             
-            // Cópia exata para não alterar o original até gravar
             treinoAtual = JSON.parse(JSON.stringify(t)); 
             exercicioAtualIndex = 0;
             
             mostrarEcra('screen-live');
             document.getElementById('liveTitle').innerText = "A Editar: " + t.routine_name;
             
-            // Congela o cronómetro mostrando apenas o tempo antigo
             if(workoutTimerInterval) clearInterval(workoutTimerInterval);
             document.getElementById('workoutTimerDisplay').innerText = formatTime(t.duration_seconds || 0);
             
@@ -589,7 +586,6 @@
                 const hora = new Date(treino.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
                 let durText = formatHistoryDuration(treino.duration_seconds);
                 
-                // NOVO: Adicionado botões Editar e Apagar no Modal de Detalhe
                 html += `
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin: ${i===0?'0':'25px'} 0 10px 0;">
                         <div>
