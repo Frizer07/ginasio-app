@@ -57,22 +57,44 @@
         .pr-badge { background: rgba(255, 214, 10, 0.15); border: 1px solid var(--warn); color: var(--warn); font-size: 11px; padding: 2px 6px; border-radius: 6px; font-weight: 800; }
         .set-check { color: var(--sec); text-align: right; font-weight: bold;}
         
+        /* CORREÇÃO DEFINITIVA DA BARRA INFERIOR (IOS PWA) */
         .bottom-nav { 
-            position: fixed; bottom: 0; left: 0; right: 0; 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
             background: rgba(28, 28, 30, 0.85); 
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
-            display: flex; border-top: 1px solid rgba(255,255,255,0.05); 
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px); 
+            display: flex; 
+            border-top: 1px solid rgba(255,255,255,0.05); 
+            
+            /* Removemos o height fixo aqui! O iOS gere o espaço apenas com padding */
             padding-bottom: env(safe-area-inset-bottom);
-            height: calc(60px + env(safe-area-inset-bottom)); 
-            box-sizing: border-box; z-index: 50; 
+            z-index: 50; 
         }
+        
         .nav-btn { 
-            background: transparent; color: var(--mut); margin: 0; flex: 1; height: 60px; padding: 10px 0 0 0;
-            border: none; font-size: 11px; font-weight: 600; 
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px;
+            background: transparent; 
+            color: var(--mut); 
+            margin: 0; 
+            flex: 1; 
+            
+            /* A altura fica fixa APENAS dentro dos botões */
+            height: 58px; 
+            padding: 8px 0;
+            border: none; 
+            font-size: 11px; 
+            font-weight: 600; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; /* Mantém o ícone e texto perfeitamente centrados */
+            gap: 4px;
         }
+        
         .nav-btn.active { color: var(--primary); }
-        .nav-icon { font-size: 20px; }
+        .nav-icon { font-size: 22px; }
 
         .list-item { background: #2c2c2e; padding: 14px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
