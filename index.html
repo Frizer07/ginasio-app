@@ -13,13 +13,11 @@
     <title>Meu Treino</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --bg: #000000; --card: #1c1c1e; --primary: #4e80ee; --sec: #30D158; --danger: #FF453A; --txt: #ffffff; --mut: #8e8e93; --radius: 16px; }
+        :root { --bg: #000000; --card: #1c1c1e; --primary: #4e80ee; --sec: #30D158; --danger: #FF453A; --warn: #FFD60A; --drop: #0A84FF; --txt: #ffffff; --mut: #8e8e93; --radius: 16px; }
         
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg); 
-            color: var(--txt); 
-            margin: 0; 
+            background: var(--bg); color: var(--txt); margin: 0; 
             padding: calc(env(safe-area-inset-top, 47px) + 20px) 20px 100px 20px; 
             -webkit-font-smoothing: antialiased; 
         }
@@ -39,35 +37,44 @@
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); margin-top:0; padding: 10px; }
         .btn-text { background: transparent; color: var(--primary); margin:0; padding: 8px; width: auto; font-size: 16px; font-weight: 600;}
         .btn-nav-ex { background: #2c2c2e; color: white; margin:0; width: auto; padding: 12px 20px; font-size: 15px; border-radius: 10px;}
-        input, select { width: 100%; padding: 16px; border-radius: 12px; border: none; background: #2c2c2e; color: white; box-sizing: border-box; margin-bottom: 8px; font-size: 16px;}
+        
+        input, select { width: 100%; padding: 16px; border-radius: 12px; border: none; background: #2c2c2e; color: white; box-sizing: border-box; margin-bottom: 8px; font-size: 16px; font-family: inherit;}
+        input::placeholder { color: #636366; font-weight: 600; }
         .row { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
-        .history-box { font-size: 14px; color: #fff; margin-bottom: 20px; background: rgba(78, 128, 238, 0.15); padding: 14px; border-radius: 10px; border-left: 4px solid var(--primary); display: flex; gap: 10px; font-weight: 500;}
-        .set-row { display: grid; grid-template-columns: 1fr 2fr 1fr; align-items: center; padding: 12px 0; border-bottom: 1px solid #2c2c2e; font-size: 16px; }
-        .set-number { background: #2c2c2e; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--mut); text-align: center; width: max-content; }
-        .set-weight { font-weight: 700; text-align: center; }
+        
+        .note-input { background: rgba(255,255,255,0.04); border: 1px dashed #3a3a3c; color: #ddd; font-size: 14px; padding: 10px 14px; border-radius: 10px; margin-bottom: 15px; width: 100%; box-sizing: border-box; }
+        .note-input:focus { outline: 1px solid var(--primary); background: rgba(78, 128, 238, 0.08); }
+
+        .history-box { font-size: 14px; color: #fff; margin-bottom: 15px; background: rgba(78, 128, 238, 0.15); padding: 12px 14px; border-radius: 10px; border-left: 4px solid var(--primary); display: flex; align-items: center; justify-content: space-between; font-weight: 500;}
+        
+        .set-row { display: grid; grid-template-columns: 45px 1fr 40px; align-items: center; padding: 12px 0; border-bottom: 1px solid #2c2c2e; font-size: 16px; }
+        .set-badge { background: #2c2c2e; padding: 6px 0; border-radius: 8px; font-size: 13px; font-weight: 800; color: var(--mut); text-align: center; width: 34px; cursor: pointer; user-select: none; }
+        .set-badge.type-W { background: rgba(255, 214, 10, 0.2); color: var(--warn); }
+        .set-badge.type-D { background: rgba(10, 132, 255, 0.2); color: var(--drop); }
+        .set-badge.type-F { background: rgba(255, 69, 58, 0.2); color: var(--danger); }
+        
+        .set-weight { font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .pr-badge { background: rgba(255, 214, 10, 0.15); border: 1px solid var(--warn); color: var(--warn); font-size: 11px; padding: 2px 6px; border-radius: 6px; font-weight: 800; }
         .set-check { color: var(--sec); text-align: right; font-weight: bold;}
         
-        /* CORREÇÃO DEFINITIVA DA BARRA INFERIOR */
         .bottom-nav { 
             position: fixed; bottom: 0; left: 0; right: 0; 
             background: rgba(28, 28, 30, 0.85); 
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
-            display: flex; 
-            border-top: 1px solid rgba(255,255,255,0.05); 
+            display: flex; border-top: 1px solid rgba(255,255,255,0.05); 
             padding-bottom: env(safe-area-inset-bottom);
-            height: calc(60px + env(safe-area-inset-bottom)); /* Força a altura exata */
-            box-sizing: border-box; /* Impede o esticamento indesejado */
-            z-index: 50; 
+            height: calc(60px + env(safe-area-inset-bottom)); 
+            box-sizing: border-box; z-index: 50; 
         }
         .nav-btn { 
-            background: transparent; color: var(--mut); margin: 0; flex: 1; 
-            height: 60px;
-            padding: 12px 0 0 0;
+            background: transparent; color: var(--mut); margin: 0; flex: 1; height: 60px; padding: 10px 0 0 0;
             border: none; font-size: 11px; font-weight: 600; 
             display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px;
         }
         .nav-btn.active { color: var(--primary); }
-        .nav-icon { font-size: 22px; }
+        .nav-icon { font-size: 20px; }
+
+        .list-item { background: #2c2c2e; padding: 14px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
         .dropdown { position: absolute; right: 0; top: 40px; background: #2c2c2e; border-radius: 12px; display: none; flex-direction: column; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8); width: 220px; overflow: hidden;}
         .dropdown button { background: transparent; color: white; padding: 16px; text-align: left; margin: 0; border-radius: 0; border-bottom: 1px solid #3a3a3c; font-size: 15px;}
@@ -143,10 +150,10 @@
         </div>
     </div>
 
-    <!-- CRIAR TEMPLATE -->
+    <!-- CRIAR / EDITAR TEMPLATE -->
     <div id="screen-create" class="screen">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h1 style="margin:0;">Criar Rotina</h1>
+            <h1 id="tituloCriadorTemplate" style="margin:0;">Criar Rotina</h1>
             <button onclick="voltarHome()" class="btn-text" style="color: var(--danger); background: rgba(255, 69, 58, 0.15); border-radius: 10px;">Cancelar</button>
         </div>
         <div class="card">
@@ -156,7 +163,7 @@
             <div class="row" style="background: #000; padding: 12px; border-radius: 12px; margin-top: 15px; flex-wrap: wrap;">
                 <input type="text" id="novoExNome" placeholder="Exercício" style="margin:0; background: #1c1c1e; flex: 1 1 100%;">
                 <div style="display: flex; gap: 10px; width: 100%;">
-                    <input type="text" inputmode="numeric" id="novoExSeries" placeholder="Séries" style="margin:0; flex: 1; background: #1c1c1e;">
+                    <input type="text" inputmode="numeric" id="novoExSeries" placeholder="Séries (3)" style="margin:0; flex: 1; background: #1c1c1e;">
                     <input type="text" inputmode="numeric" id="novoExDescanso" placeholder="Descanso (s)" style="margin:0; flex: 1; background: #1c1c1e;">
                     <button onclick="addExercicioAoTemplate()" class="btn-primary" style="width: 60px; margin: 0; font-size: 20px; padding: 12px;">+</button>
                 </div>
@@ -208,12 +215,13 @@
 
     <!-- MODAIS -->
     <div id="modalMenuTemplate" class="ui-modal-overlay" style="align-items: flex-end; padding: 0;">
-        <div class="ui-modal-box" style="border-radius: 20px 20px 0 0; max-width: 100%; transform: translateY(100%); animation: slideUpModal 0.3s forwards; padding-bottom: env(safe-area-inset-bottom, 30px);">
-            <h2 id="menuTemplateTitulo" style="margin-top:5px; margin-bottom: 25px; font-size: 24px;">Nome</h2>
-            <button id="btnIniciarTreinoMenu" class="btn-primary" style="margin-bottom: 12px; padding: 16px; font-size: 18px;">Iniciar Treino</button>
-            <button id="btnEstatisticasMenu" style="background: #2c2c2e; color: white; margin-bottom: 12px; padding: 16px; font-size: 18px;">Ver Estatísticas</button>
-            <button id="btnApagarTemplateMenu" style="background: rgba(255, 69, 58, 0.1); color: var(--danger); margin-bottom: 12px; padding: 16px; font-size: 18px;">🗑️ Eliminar Template</button>
-            <button onclick="fecharMenuTemplate()" class="btn-text" style="color: var(--mut); margin-top: 10px;">Cancelar</button>
+        <div class="ui-modal-box" style="border-radius: 20px 20px 0 0; max-width: 100%; transform: translateY(100%); animation: slideUpModal 0.3s forwards; padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 15px);">
+            <h2 id="menuTemplateTitulo" style="margin-top:5px; margin-bottom: 20px; font-size: 22px;">Nome</h2>
+            <button id="btnIniciarTreinoMenu" class="btn-primary" style="margin-bottom: 10px; padding: 15px; font-size: 17px;">▶️ Iniciar Treino</button>
+            <button id="btnEstatisticasMenu" style="background: #2c2c2e; color: white; margin-bottom: 10px; padding: 15px; font-size: 17px;">📈 Ver Estatísticas</button>
+            <button id="btnEditarTemplateMenu" style="background: #2c2c2e; color: white; margin-bottom: 10px; padding: 15px; font-size: 17px;">✏️ Editar Rotina</button>
+            <button id="btnApagarTemplateMenu" style="background: rgba(255, 69, 58, 0.1); color: var(--danger); margin-bottom: 10px; padding: 15px; font-size: 17px;">🗑️ Eliminar Rotina</button>
+            <button onclick="fecharMenuTemplate()" class="btn-text" style="color: var(--mut); margin-top: 5px;">Cancelar</button>
         </div>
     </div>
     <style>@keyframes slideUpModal { to { transform: translateY(0); } }</style>
@@ -262,7 +270,10 @@
         let todosTreinosHistorico = []; 
         let currentCalDate = new Date(); 
         let graficoChart = null;
+        
         let editandoTreinoId = null;
+        let editandoTemplateId = null;
+        let currentPendingSetType = 'N'; // 'N' (Normal), 'W' (Warmup), 'D' (Dropset), 'F' (Failure)
 
         let workoutStartTime = null;
         let workoutTimerInterval = null;
@@ -342,6 +353,7 @@
         }
         function voltarHome() { mostrarEcra('screen-home'); carregarTemplates(); }
 
+        // ======= TEMPLATES (CRIAR E EDITAR) =======
         async function carregarTemplates() {
             try {
                 const response = await fetch(`${API_URL}/templates/`); const templates = await response.json(); const lista = document.getElementById('templatesList'); lista.innerHTML = '';
@@ -357,6 +369,7 @@
             document.getElementById('menuTemplateTitulo').innerText = n;
             document.getElementById('btnIniciarTreinoMenu').onclick = () => { fecharMenuTemplate(); iniciarLiveMode(n, ex); };
             document.getElementById('btnEstatisticasMenu').onclick = () => { fecharMenuTemplate(); iniciarEstatisticasTemplate(n, ex); };
+            document.getElementById('btnEditarTemplateMenu').onclick = () => { fecharMenuTemplate(); abrirEditorTemplate(id, n, ex); };
             document.getElementById('btnApagarTemplateMenu').onclick = () => { fecharMenuTemplate(); apagarTemplate(id); };
             document.getElementById('modalMenuTemplate').style.display = 'flex';
         }
@@ -368,14 +381,36 @@
             }
         }
 
-        function abrirCriadorTemplate() { templateEmCriacao = []; document.getElementById('novoTemplateNome').value = ''; atualizarListaCriacao(); mostrarEcra('screen-create'); }
+        function abrirCriadorTemplate() { 
+            editandoTemplateId = null;
+            templateEmCriacao = []; 
+            document.getElementById('tituloCriadorTemplate').innerText = 'Criar Rotina';
+            document.getElementById('novoTemplateNome').value = ''; 
+            atualizarListaCriacao(); 
+            mostrarEcra('screen-create'); 
+        }
+
+        function abrirEditorTemplate(id, nome, exercicios) {
+            editandoTemplateId = id;
+            document.getElementById('tituloCriadorTemplate').innerText = 'Editar Rotina';
+            document.getElementById('novoTemplateNome').value = nome;
+            templateEmCriacao = exercicios.map(ex => ({
+                name: typeof ex === 'string' ? ex : ex.name,
+                target_sets: typeof ex === 'string' ? 3 : (ex.target_sets || 3),
+                rest_seconds: typeof ex === 'string' ? 0 : (ex.rest_seconds || 0)
+            }));
+            atualizarListaCriacao();
+            mostrarEcra('screen-create');
+        }
+
         function addExercicioAoTemplate() {
-            const nome = document.getElementById('novoExNome').value;
+            const nome = document.getElementById('novoExNome').value.trim();
             const series = parseInt(document.getElementById('novoExSeries').value.replace(/[^0-9]/g, '')) || 3;
             const descanso = parseInt(document.getElementById('novoExDescanso').value.replace(/[^0-9]/g, '')) || 0; 
             if(!nome) return showToast("Dá um nome ao exercício", "⚠️");
             templateEmCriacao.push({ name: nome, target_sets: series, rest_seconds: descanso });
-            document.getElementById('novoExNome').value = ''; document.getElementById('novoExSeries').value = ''; document.getElementById('novoExDescanso').value = ''; atualizarListaCriacao();
+            document.getElementById('novoExNome').value = ''; document.getElementById('novoExSeries').value = ''; document.getElementById('novoExDescanso').value = ''; 
+            atualizarListaCriacao();
         }
         function atualizarListaCriacao() {
             const lista = document.getElementById('listaExCriacao'); lista.innerHTML = templateEmCriacao.length === 0 ? '<span style="font-size: 14px; color:#555;">Adiciona exercícios abaixo...</span>' : '';
@@ -385,11 +420,21 @@
             });
         }
         function removerExTemplate(index) { templateEmCriacao.splice(index, 1); atualizarListaCriacao(); }
+        
         async function guardarTemplate() {
-            const n = document.getElementById('novoTemplateNome').value; if(!n || templateEmCriacao.length === 0) return showToast("Dá um nome e adiciona exercícios", "⚠️");
-            try { await fetch(`${API_URL}/templates/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: n, exercises: templateEmCriacao }) }); showToast("Rotina guardada", "✅"); voltarHome(); } catch (e) { showToast("Erro de ligação", "❌"); }
+            const n = document.getElementById('novoTemplateNome').value.trim(); 
+            if(!n || templateEmCriacao.length === 0) return showToast("Dá um nome e adiciona exercícios", "⚠️");
+            try { 
+                let url = editandoTemplateId ? `${API_URL}/templates/${editandoTemplateId}` : `${API_URL}/templates/`;
+                let method = editandoTemplateId ? 'PUT' : 'POST';
+                await fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: n, exercises: templateEmCriacao }) }); 
+                showToast(editandoTemplateId ? "Rotina atualizada!" : "Rotina guardada!", "✅"); 
+                editandoTemplateId = null;
+                voltarHome(); 
+            } catch (e) { showToast("Erro de ligação", "❌"); }
         }
 
+        // ======= GRÁFICOS (Ignorando séries Warm-up 'W') =======
         async function iniciarEstatisticasTemplate(nome, exercicios) {
             mostrarEcra('screen-stats'); document.getElementById('statsTitle').innerText = nome;
             document.getElementById('statsExercicioSelect').innerHTML = exercicios.map(ex => { let exName = typeof ex === 'string' ? ex : ex.name; return `<option value="${exName}">${exName}</option>`; }).join('');
@@ -401,31 +446,87 @@
             [...todosTreinosHistorico].reverse().forEach(t => {
                 let exEnc = t.exercises.find(e => e.name.toLowerCase() === exNome.toLowerCase());
                 if (exEnc && exEnc.sets && exEnc.sets.length > 0) {
+                    // Filtra apenas séries válidas de trabalho (ignora 'W')
+                    let workingSets = exEnc.sets.filter(s => (s.type || 'N') !== 'W');
+                    if (workingSets.length === 0) return;
+
                     let valor = 0;
-                    if (met === 'max_weight') { valor = Math.max(...exEnc.sets.map(s => s.weight_kg)); document.getElementById('graficoTitulo').innerText = "Carga Máxima (Kg)"; } 
-                    else if (met === '1rm') { valor = Math.round(Math.max(...exEnc.sets.map(s => s.weight_kg * (1 + s.reps / 30))) * 10) / 10; document.getElementById('graficoTitulo').innerText = "1RM Estimado (Kg)"; } 
-                    else if (met === 'volume') { valor = exEnc.sets.reduce((tot, s) => tot + (s.weight_kg * s.reps), 0); document.getElementById('graficoTitulo').innerText = "Volume Total (Kg movidos)"; }
+                    if (met === 'max_weight') { valor = Math.max(...workingSets.map(s => s.weight_kg)); document.getElementById('graficoTitulo').innerText = "Carga Máxima (Kg)"; } 
+                    else if (met === '1rm') { valor = Math.round(Math.max(...workingSets.map(s => s.weight_kg * (1 + s.reps / 30))) * 10) / 10; document.getElementById('graficoTitulo').innerText = "1RM Estimado (Kg)"; } 
+                    else if (met === 'volume') { valor = workingSets.reduce((tot, s) => tot + (s.weight_kg * s.reps), 0); document.getElementById('graficoTitulo').innerText = "Volume Total (Kg movidos)"; }
                     dados.push({ data: new Date(t.date).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' }), valor: valor });
                 }
             });
             if (graficoChart) graficoChart.destroy();
             const container = document.getElementById('chartContainer');
-            if (dados.length === 0) { container.innerHTML = '<p style="color:var(--mut); text-align:center; padding-top: 50px; font-size:15px;">Sem dados suficientes.</p>'; return; }
+            if (dados.length === 0) { container.innerHTML = '<p style="color:var(--mut); text-align:center; padding-top: 50px; font-size:15px;">Sem dados de séries de trabalho suficientes.</p>'; return; }
             container.innerHTML = '<canvas id="progressChartCanvas"></canvas>';
             let cor = met === '1rm' ? '#FF9500' : (met === 'max_weight' ? '#4e80ee' : '#30D158'); 
             let bg = met === '1rm' ? 'rgba(255, 149, 0, 0.1)' : (met === 'max_weight' ? 'rgba(78, 128, 238, 0.1)' : 'rgba(48, 209, 88, 0.1)');
             graficoChart = new Chart(document.getElementById('progressChartCanvas').getContext('2d'), { type: 'line', data: { labels: dados.map(d => d.data), datasets: [{ label: met === 'volume' ? 'Volume' : 'Kg', data: dados.map(d => d.valor), borderColor: cor, backgroundColor: bg, borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: cor, pointRadius: 5, fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#2c2c2e', drawBorder: false } }, x: { grid: { display: false } } } } });
         }
 
+        // ======= LIVE MODE AVANÇADO =======
+        function guardarNotaExercicio(val) {
+            if (treinoAtual && treinoAtual.exercises[exercicioAtualIndex]) {
+                treinoAtual.exercises[exercicioAtualIndex].note = val;
+                guardarEstadoLocal();
+            }
+        }
+
+        function alternarTipoInput() {
+            const ordem = ['N', 'W', 'D', 'F'];
+            currentPendingSetType = ordem[(ordem.indexOf(currentPendingSetType) + 1) % ordem.length];
+            renderizarLiveMode();
+        }
+
+        function alternarTipoSerieFeita(setIdx) {
+            const ordem = ['N', 'W', 'D', 'F'];
+            let s = treinoAtual.exercises[exercicioAtualIndex].sets[setIdx];
+            let atual = s.type || 'N';
+            s.type = ordem[(ordem.indexOf(atual) + 1) % ordem.length];
+            if (s.type === 'W') s.is_pr = false; // Aquecimento não conta como PR
+            guardarEstadoLocal();
+            renderizarLiveMode();
+        }
+
+        function verificarSeEhPR(ex, kg, reps, type) {
+            if (type === 'W') return false;
+            // Só destaca PR se já houver histórico prévio desse exercício
+            if (!ex.history || ex.history.length === 0) return false;
+
+            let maxW = ex.max_weight || 0;
+            let maxRM = ex.max_1rm || 0;
+
+            ex.sets.forEach(s => {
+                if ((s.type || 'N') !== 'W') {
+                    if (s.weight_kg > maxW) maxW = s.weight_kg;
+                    let rm = s.weight_kg * (1 + s.reps / 30.0);
+                    if (rm > maxRM) maxRM = rm;
+                }
+            });
+
+            let currentRM = kg * (1 + reps / 30.0);
+            return (kg > maxW) || (currentRM > maxRM + 0.05);
+        }
+
         function tentarAutoSave() {
             const kgInput = document.getElementById('current_weight'); const repsInput = document.getElementById('current_reps');
             if (kgInput && repsInput) {
                 let kgClean = kgInput.value.replace(/[^0-9.,]/g, '').replace(',', '.'); let repsClean = repsInput.value.replace(/[^0-9]/g, '');
-                if (kgClean && repsClean) { treinoAtual.exercises[exercicioAtualIndex].sets.push({ weight_kg: parseFloat(kgClean), reps: parseInt(repsClean) }); return true; } 
+                if (kgClean && repsClean) { 
+                    const ex = treinoAtual.exercises[exercicioAtualIndex];
+                    let w = parseFloat(kgClean); let r = parseInt(repsClean);
+                    let isPr = verificarSeEhPR(ex, w, r, currentPendingSetType);
+                    ex.sets.push({ weight_kg: w, reps: r, type: currentPendingSetType, is_pr: isPr }); 
+                    currentPendingSetType = 'N';
+                    return true; 
+                } 
                 else if (kgInput.value.trim() !== '' || repsInput.value.trim() !== '') { showToast("Preenche os dois valores ou apaga.", "⚠️"); return false; }
             }
             return true;
         }
+
         function toggleDropdown() { const dp = document.getElementById('liveDropdown'); dp.style.display = dp.style.display === 'flex' ? 'none' : 'flex'; }
         function fecharDropdown() { document.getElementById('liveDropdown').style.display = 'none'; }
         
@@ -446,26 +547,33 @@
 
         async function iniciarLiveMode(nome, exerciciosLista) {
             mostrarEcra('screen-live'); document.getElementById('liveTitle').innerText = nome;
-            exercicioAtualIndex = 0; editandoTreinoId = null;
+            exercicioAtualIndex = 0; editandoTreinoId = null; currentPendingSetType = 'N';
             treinoAtual = { routine_name: nome, exercises: exerciciosLista.map(ex => {
                 let exName = typeof ex === 'string' ? ex : ex.name; 
                 let targetSets = typeof ex === 'string' ? 3 : (ex.target_sets || 3);
                 let restSecs = typeof ex === 'string' ? 0 : (ex.rest_seconds || 0);
-                return { name: exName, target_sets: targetSets, rest_seconds: restSecs, sets: [], history: [] };
+                return { name: exName, target_sets: targetSets, rest_seconds: restSecs, note: "", sets: [], history: [], max_weight: 0, max_1rm: 0 };
             }) };
             
             startWorkoutTimer(); guardarEstadoLocal(); 
             
             for (let i = 0; i < treinoAtual.exercises.length; i++) {
                 try {
-                    let resp = await fetch(`${API_URL}/historico/${treinoAtual.exercises[i].name}`); let data = await resp.json();
-                    if(data && data.sets) { treinoAtual.exercises[i].history = data.sets; guardarEstadoLocal(); }
+                    let resp = await fetch(`${API_URL}/historico/${encodeURIComponent(treinoAtual.exercises[i].name)}`); 
+                    let data = await resp.json();
+                    if(data) { 
+                        if(data.sets) treinoAtual.exercises[i].history = data.sets; 
+                        if(data.note) treinoAtual.exercises[i].note = data.note;
+                        treinoAtual.exercises[i].max_weight = data.max_weight || 0;
+                        treinoAtual.exercises[i].max_1rm = data.max_1rm || 0;
+                        guardarEstadoLocal(); 
+                    }
                 } catch(e) { }
             }
             renderizarLiveMode();
         }
 
-        function navegarExercicio(direcao) { if (!tentarAutoSave()) return; fecharDropdown(); exercicioAtualIndex += direcao; fecharRestTimer(); guardarEstadoLocal(); renderizarLiveMode(); }
+        function navegarExercicio(direcao) { if (!tentarAutoSave()) return; fecharDropdown(); exercicioAtualIndex += direcao; currentPendingSetType = 'N'; fecharRestTimer(); guardarEstadoLocal(); renderizarLiveMode(); }
         function desfazerUltimaSerie() { if (treinoAtual.exercises[exercicioAtualIndex].sets.length > 0) { treinoAtual.exercises[exercicioAtualIndex].sets.pop(); fecharRestTimer(); guardarEstadoLocal(); renderizarLiveMode(); showToast("Série removida", "↩️"); } }
 
         function renderizarLiveMode() {
@@ -473,37 +581,107 @@
             const exercicio = treinoAtual.exercises[exercicioAtualIndex]; const currentSetIndex = exercicio.sets.length;
             
             let textoHistorico = "Primeira vez a registar.";
+            let suggestedWeight = "";
+            let suggestedReps = "";
+
             if (exercicio.history && exercicio.history.length > 0) {
-                if (currentSetIndex < exercicio.history.length) { textoHistorico = `Série ${currentSetIndex + 1}: <strong style="color:white;">${exercicio.history[currentSetIndex].weight_kg}kg × ${exercicio.history[currentSetIndex].reps}</strong>`; } 
-                else { textoHistorico = `Já superaste o volume anterior!`; }
+                let histS = currentSetIndex < exercicio.history.length 
+                    ? exercicio.history[currentSetIndex] 
+                    : exercicio.history[exercicio.history.length - 1];
+                
+                suggestedWeight = histS.weight_kg;
+                suggestedReps = histS.reps;
+
+                if (currentSetIndex < exercicio.history.length) { 
+                    textoHistorico = `<span>🕰️ Série ${currentSetIndex + 1} ant: <strong style="color:white;">${histS.weight_kg}kg × ${histS.reps}</strong></span> <span style="font-size:12px; color:var(--primary); font-weight:700;">Tap ✓ para repetir</span>`; 
+                } else { 
+                    textoHistorico = `<span>🕰️ Última série ant: <strong style="color:white;">${histS.weight_kg}kg × ${histS.reps}</strong></span>`; 
+                }
+            } else {
+                textoHistorico = `<span>🕰️ Primeira vez a registar.</span>`;
             }
 
-            let setsHTML = exercicio.sets.map((s, i) => `<div class="set-row"><div class="set-number">${i + 1}</div><div class="set-weight">${s.weight_kg} kg <span style="color:#666; font-size:14px; margin: 0 4px;">×</span> ${s.reps}</div><div class="set-check">✓</div></div>`).join('');
+            let setsHTML = exercicio.sets.map((s, i) => {
+                let sType = s.type || 'N';
+                let badgeLabel = sType === 'N' ? (i + 1) : sType;
+                let badgeClass = sType === 'N' ? '' : `type-${sType}`;
+                let prBadge = s.is_pr ? `<span class="pr-badge">🏆 PR</span>` : '';
+                return `<div class="set-row">
+                    <div class="set-badge ${badgeClass}" onclick="alternarTipoSerieFeita(${i})" title="Toca para mudar: Normal, Warmup, Dropset, Falha">${badgeLabel}</div>
+                    <div class="set-weight">${s.weight_kg} kg <span style="color:#666; font-size:14px;">×</span> ${s.reps} ${prBadge}</div>
+                    <div class="set-check">✓</div>
+                </div>`;
+            }).join('');
+            
             let isLastEx = exercicioAtualIndex === treinoAtual.exercises.length - 1;
             let btnNextTopHTML = isLastEx ? `<span style="width: 70px;"></span>` : `<button class="btn-nav-ex" onclick="navegarExercicio(1)">Próx &gt;</button>`;
 
             let headerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 5px;"><button class="btn-nav-ex" onclick="navegarExercicio(-1)" ${exercicioAtualIndex === 0 ? 'style="visibility:hidden;"' : ''}>&lt; Ant</button><span style="font-size: 14px; font-weight: 700; color: var(--mut); background: #2c2c2e; padding: 6px 14px; border-radius: 20px;">${exercicioAtualIndex + 1} de ${treinoAtual.exercises.length}</span>${btnNextTopHTML}</div>`;
 
-            let hasTarget = exercicio.target_sets && exercicio.target_sets > 0; let isDone = hasTarget && currentSetIndex >= exercicio.target_sets; let inputAreaHTML = '';
-            let btnUndo = currentSetIndex > 0 ? `<button onclick="desfazerUltimaSerie()" style="background: #2c2c2e; color: white; border-radius: 12px; width: 60px; height: 53px; margin:0; margin-bottom: 8px; font-size: 18px;">⎌</button>` : '';
+            let hasTarget = exercicio.target_sets && exercicio.target_sets > 0; 
+            // Só conta séries de trabalho (ignora 'W') para dar o exercício como concluído? Não, contamos todas para respeitar o template, ou como preferires
+            let isDone = hasTarget && currentSetIndex >= exercicio.target_sets; 
+            let inputAreaHTML = '';
+            let btnUndo = currentSetIndex > 0 ? `<button onclick="desfazerUltimaSerie()" style="background: #2c2c2e; color: white; border-radius: 12px; width: 48px; height: 53px; margin:0; margin-bottom: 8px; font-size: 18px; flex-shrink:0;">⎌</button>` : '';
+
+            // Botão seletor de tipo da próxima série
+            let pendingLabel = currentPendingSetType === 'N' ? `${currentSetIndex + 1}` : currentPendingSetType;
+            let pendingClass = currentPendingSetType === 'N' ? '' : `type-${currentPendingSetType}`;
+            let btnSetType = `<button onclick="alternarTipoInput()" class="set-badge ${pendingClass}" style="width: 48px; height: 53px; border-radius: 12px; margin:0; margin-bottom: 8px; font-size: 16px; border: 1px solid #3a3a3c; flex-shrink:0;">${pendingLabel}</button>`;
+
+            let phWeight = suggestedWeight !== "" ? `${suggestedWeight} kg` : "Kg";
+            let phReps = suggestedReps !== "" ? `${suggestedReps} reps` : "Reps";
 
             if (isDone) {
                 let actionBtn = isLastEx ? `<button class="btn-primary" style="margin-top: 15px; padding: 18px; font-size: 18px; border-radius:16px;" onclick="finalizarTreino()">Gravar Treino</button>` : `<button class="btn-primary" style="margin-top: 15px; padding: 18px; border-radius:16px;" onclick="navegarExercicio(1)">Próximo Exercício</button>`;
                 inputAreaHTML = `<div style="background: rgba(48, 209, 88, 0.1); padding: 24px; border-radius: 16px; text-align: center; border: 1px solid rgba(48, 209, 88, 0.3); margin-top: 25px; position:relative;">${currentSetIndex > 0 ? `<button onclick="desfazerUltimaSerie()" class="btn-text" style="position:absolute; top: 10px; right: 10px; color: var(--mut); padding:5px; font-size: 20px;">⎌</button>` : ''}<div style="font-size:32px; margin-bottom:10px;">🏆</div><h3 style="margin: 0 0 5px 0; color: var(--sec);">Todas as séries feitas</h3>${actionBtn}</div>`;
             } else {
-                inputAreaHTML = `<div class="row" style="margin-top: 25px; gap:8px;">${btnUndo}<input type="text" inputmode="decimal" id="current_weight" placeholder="Kg" style="text-align:center; font-size:18px; font-weight:bold; background:#1c1c1e; border: 1px solid #3a3a3c;"><input type="text" inputmode="numeric" id="current_reps" placeholder="Reps" style="text-align:center; font-size:18px; font-weight:bold; background:#1c1c1e; border: 1px solid #3a3a3c;"><button class="btn-primary" style="width: 60px; height: 53px; border-radius:12px; margin:0; margin-bottom:8px;" onclick="registarSerie()">✓</button></div>`;
+                inputAreaHTML = `
+                    <div class="row" style="margin-top: 22px; gap:6px;">
+                        ${btnUndo}
+                        ${btnSetType}
+                        <input type="text" inputmode="decimal" id="current_weight" placeholder="${phWeight}" data-suggested="${suggestedWeight}" style="text-align:center; font-size:17px; font-weight:bold; background:#1c1c1e; border: 1px solid #3a3a3c;">
+                        <input type="text" inputmode="numeric" id="current_reps" placeholder="${phReps}" data-suggested="${suggestedReps}" style="text-align:center; font-size:17px; font-weight:bold; background:#1c1c1e; border: 1px solid #3a3a3c;">
+                        <button class="btn-primary" style="width: 56px; height: 53px; border-radius:12px; margin:0; margin-bottom:8px; flex-shrink:0;" onclick="registarSerie()">✓</button>
+                    </div>
+                    <div style="font-size: 11px; color: var(--mut); text-align: center; margin-top: 2px;">Toca no número da série para alternar: <b>Normal</b> • <b style="color:var(--warn)">W</b>armup • <b style="color:var(--drop)">D</b>ropset • <b style="color:var(--danger)">F</b>alha</div>
+                `;
             }
 
-            container.innerHTML = headerHTML + `<div class="exercise-card"><h2 style="margin: 0 0 15px 0; font-size:22px; font-weight:800; letter-spacing:-0.5px;">${exercicio.name} <span style="color:var(--mut); font-size:16px; font-weight:600; display:block; margin-top:4px;">${exercicio.target_sets} séries alvo</span></h2><div class="history-box"><span style="font-size:16px;">🕰️</span> ${textoHistorico}</div><div style="margin-top: 20px;">${setsHTML}</div>${inputAreaHTML}</div>`;
+            let safeNote = (exercicio.note || "").replace(/"/g, '&quot;');
+
+            container.innerHTML = headerHTML + `
+                <div class="exercise-card">
+                    <h2 style="margin: 0 0 10px 0; font-size:22px; font-weight:800; letter-spacing:-0.5px;">${exercicio.name} <span style="color:var(--mut); font-size:15px; font-weight:600; display:block; margin-top:4px;">${exercicio.target_sets} séries alvo</span></h2>
+                    <input type="text" class="note-input" placeholder="📌 Adicionar nota fixa (ex: banco pos. 3, pega fechada)..." value="${safeNote}" oninput="guardarNotaExercicio(this.value)">
+                    <div class="history-box">${textoHistorico}</div>
+                    <div style="margin-top: 15px;">${setsHTML}</div>
+                    ${inputAreaHTML}
+                </div>`;
         }
 
         function registarSerie() {
-            let kgRaw = document.getElementById('current_weight').value; let repsRaw = document.getElementById('current_reps').value;
-            let kgClean = kgRaw.replace(/[^0-9.,]/g, '').replace(',', '.'); let repsClean = repsRaw.replace(/[^0-9]/g, '');
-            if(!kgClean || !repsClean) return showToast("Faltam valores na série!", "⚠️");
+            const kgEl = document.getElementById('current_weight');
+            const repsEl = document.getElementById('current_reps');
+            
+            // Tap-to-Fill: se estiver vazio, usa o valor sugerido do treino anterior!
+            let kgRaw = kgEl.value.trim() || kgEl.getAttribute('data-suggested') || '';
+            let repsRaw = repsEl.value.trim() || repsEl.getAttribute('data-suggested') || '';
+            
+            let kgClean = String(kgRaw).replace(/[^0-9.,]/g, '').replace(',', '.'); 
+            let repsClean = String(repsRaw).replace(/[^0-9]/g, '');
+            
+            if(!kgClean || !repsClean) return showToast("Insere Kg e Reps para registar!", "⚠️");
             
             const ex = treinoAtual.exercises[exercicioAtualIndex];
-            ex.sets.push({ weight_kg: parseFloat(kgClean), reps: parseInt(repsClean) });
+            let w = parseFloat(kgClean);
+            let r = parseInt(repsClean);
+            let isPr = verificarSeEhPR(ex, w, r, currentPendingSetType);
+
+            ex.sets.push({ weight_kg: w, reps: r, type: currentPendingSetType, is_pr: isPr });
+            
+            if (isPr) showToast("Novo Recorde Pessoal (PR)!", "🏆");
+            currentPendingSetType = 'N'; // volta a série normal após registar
             
             if (ex.rest_seconds && ex.rest_seconds > 0) startRestTimer(ex.rest_seconds);
             guardarEstadoLocal(); renderizarLiveMode();
@@ -519,7 +697,17 @@
                     clearInterval(workoutTimerInterval); 
                 }
                 
-                const dados = { routine_name: treinoAtual.routine_name, duration_seconds: duration, exercises: treinoAtual.exercises.map(ex => ({ name: ex.name, target_sets: ex.target_sets, sets: ex.sets })) };
+                const dados = { 
+                    routine_name: treinoAtual.routine_name, 
+                    duration_seconds: duration, 
+                    exercises: treinoAtual.exercises.map(ex => ({ 
+                        name: ex.name, 
+                        target_sets: ex.target_sets, 
+                        rest_seconds: ex.rest_seconds || 0,
+                        note: ex.note || "",
+                        sets: ex.sets 
+                    })) 
+                };
                 
                 let endpoint = `${API_URL}/treinos/`; let method = 'POST';
                 if (editandoTreinoId) { endpoint = `${API_URL}/treinos/${editandoTreinoId}`; method = 'PUT'; }
@@ -552,7 +740,6 @@
                 lista.innerHTML = todosTreinosHistorico.length === 0 ? '<p style="color: var(--mut); text-align:center; padding: 20px;">Nenhum treino registado.</p>' : '';
                 todosTreinosHistorico.forEach((t, index) => {
                     const dataF = new Date(t.date).toLocaleDateString('pt-PT') + ' ' + new Date(t.date).getHours() + ':' + String(new Date(t.date).getMinutes()).padStart(2, '0');
-                    let totalSets = t.exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
                     let durTxt = formatHistoryDuration(t.duration_seconds); 
                     lista.innerHTML += `<div class="card" onclick="abrirTreinosDoDia([${index}])" style="border-left: 4px solid var(--primary); cursor: pointer;"><div style="display: flex; justify-content: space-between; align-items:center;"><h3 style="margin: 0; font-size:18px;">${t.routine_name}</h3><span style="font-size: 13px; color: var(--mut); font-weight:600;">${dataF}</span></div><p style="font-size: 14px; color: #ccc; margin: 12px 0 0 0; font-weight:500;">${t.exercises.length} exercícios <span style="color:#666;">•</span> ⏱️ ${durTxt}</p></div>`;
                 });
@@ -613,9 +800,14 @@
                     </div>`;
                 
                 treino.exercises.forEach(ex => {
-                    let setsHtml = ex.sets.map((s, i) => `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px; color:#ddd;"><span style="color:var(--mut);">Série ${i+1}</span> <strong>${s.weight_kg}kg x ${s.reps}</strong></div>`).join('');
+                    let noteHtml = ex.note ? `<p style="font-size:12px; color:var(--mut); margin: -5px 0 8px 0; font-style:italic;">📌 ${ex.note}</p>` : '';
+                    let setsHtml = ex.sets.map((s, idxSet) => {
+                        let tLabel = (s.type && s.type !== 'N') ? `[${s.type}] ` : `Série ${idxSet+1}`;
+                        let prHtml = s.is_pr ? ` <span style="color:var(--warn); font-size:12px;">🏆 PR</span>` : '';
+                        return `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px; color:#ddd;"><span style="color:var(--mut);">${tLabel}</span> <strong>${s.weight_kg}kg x ${s.reps}${prHtml}</strong></div>`;
+                    }).join('');
                     if (ex.sets.length === 0) setsHtml = '<p style="color:var(--mut); font-size:13px; margin:0;">Nenhuma série registada.</p>';
-                    html += `<div style="background:#2c2c2e; padding:12px; border-radius:10px; margin-bottom:12px;"><h4 style="margin: 0 0 10px 0; color:white; font-size:15px;">${ex.name}</h4>${setsHtml}</div>`;
+                    html += `<div style="background:#2c2c2e; padding:12px; border-radius:10px; margin-bottom:12px;"><h4 style="margin: 0 0 10px 0; color:white; font-size:15px;">${ex.name}</h4>${noteHtml}${setsHtml}</div>`;
                 });
                 if (i < indices.length - 1) html += `<div style="height: 1px; background: #3a3a3c; margin: 20px 0;"></div>`;
             });
