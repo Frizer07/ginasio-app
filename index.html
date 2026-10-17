@@ -2,101 +2,108 @@
 <html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Meu Treino</title>
+    <meta name="theme-color" content="#000000">
     
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2964/2964514.png">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2964/2964514.png">
+    
+    <title>Meu Treino</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
-        /* === HEVY-INSPIRED DESIGN SYSTEM === */
-        :root { 
-            --bg: #000000;
-            --card: #1c1c1e;
-            --primary: #4e80ee;
-            --sec: #30D158;
-            --danger: #FF453A;
-            --txt: #ffffff; 
-            --mut: #8e8e93;
-            --radius: 16px;
-        }
+        :root { --bg: #000000; --card: #1c1c1e; --primary: #4e80ee; --sec: #30D158; --danger: #FF453A; --txt: #ffffff; --mut: #8e8e93; --radius: 16px; }
         
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg); color: var(--txt); margin: 0; 
-            padding: 20px 20px 90px 20px; padding-top: env(safe-area-inset-top, 40px); 
-            -webkit-font-smoothing: antialiased;
+            background: var(--bg); 
+            color: var(--txt); 
+            margin: 0; 
+            /* Correção da barra superior: Adiciona 20px de margem abaixo da notch do iPhone */
+            padding: calc(env(safe-area-inset-top, 47px) + 20px) 20px 100px 20px; 
+            -webkit-font-smoothing: antialiased; 
         }
-
+        
         .screen { display: none; animation: fadeUp 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .screen.active { display: block; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 20px; }
+        
+        h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 20px; margin-top: 0; }
         
         .card { background: var(--card); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .exercise-card { background: var(--card); border-radius: var(--radius); padding: 22px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.4);}
-        
-        button { font-family: inherit; font-size: 16px; font-weight: 700; border: none; border-radius: 12px; padding: 14px; width: 100%; cursor: pointer; transition: transform 0.1s, opacity 0.2s; margin-top: 10px; }
+        button { font-family: inherit; font-size: 16px; font-weight: 700; border: none; border-radius: 12px; padding: 14px; width: 100%; cursor: pointer; transition: transform 0.1s; margin-top: 10px; }
         button:active { transform: scale(0.97); }
-        button:disabled { background: #3a3a3c; color: #636366; cursor: not-allowed; }
-        
         .btn-primary { background: var(--primary); color: #fff; }
         .btn-success { background: var(--sec); color: #000; }
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); margin-top:0; padding: 10px; }
         .btn-text { background: transparent; color: var(--primary); margin:0; padding: 8px; width: auto; font-size: 16px; font-weight: 600;}
         .btn-nav-ex { background: #2c2c2e; color: white; margin:0; width: auto; padding: 12px 20px; font-size: 15px; border-radius: 10px;}
-        
-        input, select { width: 100%; padding: 16px; border-radius: 12px; border: none; background: #2c2c2e; color: white; box-sizing: border-box; margin-bottom: 8px; font-size: 16px; font-family: inherit;}
-        input:focus, select:focus { outline: 2px solid var(--primary); }
+        input, select { width: 100%; padding: 16px; border-radius: 12px; border: none; background: #2c2c2e; color: white; box-sizing: border-box; margin-bottom: 8px; font-size: 16px;}
         .row { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
-        
-        .history-box { font-size: 14px; color: #fff; margin-bottom: 20px; display: block; background: rgba(78, 128, 238, 0.15); padding: 14px; border-radius: 10px; border-left: 4px solid var(--primary); display: flex; align-items: center; gap: 10px; font-weight: 500;}
+        .history-box { font-size: 14px; color: #fff; margin-bottom: 20px; background: rgba(78, 128, 238, 0.15); padding: 14px; border-radius: 10px; border-left: 4px solid var(--primary); display: flex; gap: 10px; font-weight: 500;}
         .set-row { display: grid; grid-template-columns: 1fr 2fr 1fr; align-items: center; padding: 12px 0; border-bottom: 1px solid #2c2c2e; font-size: 16px; }
         .set-number { background: #2c2c2e; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--mut); text-align: center; width: max-content; }
         .set-weight { font-weight: 700; text-align: center; }
         .set-check { color: var(--sec); text-align: right; font-weight: bold;}
         
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(28, 28, 30, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; border-top: 1px solid #2c2c2e; padding-bottom: env(safe-area-inset-bottom, 15px); z-index: 50; }
-        .nav-btn { background: transparent; color: var(--mut); margin: 0; border-radius: 0; flex: 1; padding: 16px 0; border: none; font-size: 12px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px;}
+        /* Correção da barra de navegação inferior */
+        .bottom-nav { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: rgba(28, 28, 30, 0.85); 
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
+            display: flex; 
+            border-top: 1px solid rgba(255,255,255,0.05); 
+            padding-bottom: env(safe-area-inset-bottom); /* Removido o limite extra que causava o espaço gigante */
+            z-index: 50; 
+        }
+        .nav-btn { 
+            background: transparent; color: var(--mut); margin: 0; flex: 1; 
+            padding: 12px 0 8px 0; /* Padding reduzido para um aspeto slim e nativo */
+            border: none; font-size: 11px; font-weight: 600; 
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
         .nav-btn.active { color: var(--primary); }
-        .nav-icon { font-size: 20px; }
-
-        .list-item { background: #2c2c2e; padding: 14px; border-radius: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-icon { font-size: 22px; }
 
         .dropdown { position: absolute; right: 0; top: 40px; background: #2c2c2e; border-radius: 12px; display: none; flex-direction: column; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.8); width: 220px; overflow: hidden;}
         .dropdown button { background: transparent; color: white; padding: 16px; text-align: left; margin: 0; border-radius: 0; border-bottom: 1px solid #3a3a3c; font-size: 15px;}
-        .dropdown button:last-child { border-bottom: none; }
-        
         .active-workout-banner { background: rgba(78, 128, 238, 0.1); border: 1px solid var(--primary); border-radius: var(--radius); padding: 18px; margin-bottom: 20px; display: none;}
         
-        #toastContainer { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; }
-        .toast { background: #2c2c2e; color: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 12px; animation: slideDown 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: auto; }
+        #toastContainer { position: fixed; top: env(safe-area-inset-top, 40px); left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px; pointer-events: none; margin-top: 10px; }
+        .toast { background: #2c2c2e; color: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 12px; animation: slideDown 0.3s forwards; pointer-events: auto; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .ui-modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; animation: fadeIn 0.2s ease;}
-        .ui-modal-box { background: var(--card); padding: 24px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.5); transform: scale(0.95); animation: popIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; max-height: 80vh; overflow-y: auto;}
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .ui-modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .ui-modal-box { background: var(--card); padding: 24px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.5); transform: scale(0.95); animation: popIn 0.3s forwards; max-height: 80vh; overflow-y: auto;}
         @keyframes popIn { to { transform: scale(1); } }
         .ui-modal-title { font-size: 20px; font-weight: 800; margin: 0 0 10px 0; }
         .ui-modal-text { font-size: 15px; color: var(--mut); margin: 0 0 24px 0; line-height: 1.4; }
         .ui-modal-actions { display: flex; gap: 12px; }
-        .ui-modal-actions button { margin: 0; }
-
+        
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-bottom: 10px;}
         .cal-day-name { font-size: 12px; color: var(--mut); font-weight: 700; margin-bottom: 5px;}
-        .cal-day { padding: 10px 0; border-radius: 8px; font-size: 15px; font-weight: 600; color: #fff; background: #2c2c2e; cursor: pointer;}
+        .cal-day { padding: 8px 0; border-radius: 8px; font-size: 15px; font-weight: 600; color: #fff; background: #2c2c2e; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 40px;}
         .cal-day.empty { background: transparent; cursor: default; }
-        .cal-day.has-workout { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(78, 128, 238, 0.5);}
-        .cal-day.today { border: 1px solid #fff; }
+        .cal-day.has-workout { background: rgba(78, 128, 238, 0.15); color: var(--primary); }
+        .cal-dots { display: flex; gap: 4px; margin-top: 4px; height: 6px; }
+        .cal-dot { width: 5px; height: 5px; background: var(--primary); border-radius: 50%; }
+        
+        #restTimerBanner { position: fixed; top: 0; left: 0; right: 0; background: var(--primary); color: white; padding: 15px; padding-top: calc(env(safe-area-inset-top, 40px) + 15px); display: none; justify-content: space-between; align-items: center; z-index: 100; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: background 0.3s; }
     </style>
 </head>
 <body>
 
     <div id="toastContainer"></div>
+    <div id="restTimerBanner">
+        <span style="font-size: 20px;">⏱️</span>
+        <span id="restTimerText">00:00</span>
+        <button onclick="fecharRestTimer()" style="background: rgba(0,0,0,0.3); color: white; margin:0; padding: 6px 12px; width: auto; border-radius: 8px; font-size: 14px;">Saltar</button>
+    </div>
 
+    <!-- HOME -->
     <div id="screen-home" class="screen active">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h1 style="margin:0;">Treinos</h1>
@@ -113,32 +120,28 @@
         <div id="templatesList"></div>
     </div>
 
-    <!-- ECRÃ DE ESTATÍSTICAS DO TREINO (Atualizado) -->
+    <!-- STATS -->
     <div id="screen-stats" class="screen">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <button onclick="voltarHome()" class="btn-text" style="padding:0; margin-right: 15px;">&lt; Voltar</button>
             <h2 id="statsTitle" style="margin:0; font-size: 20px; text-align: center; flex: 1;">Estatísticas</h2>
             <div style="width: 60px;"></div>
         </div>
-
         <div class="card" style="padding: 25px 20px;">
             <p style="color: var(--mut); margin: 0 0 10px 0; font-size: 12px; font-weight: bold; text-transform: uppercase;">1. Escolher Exercício</p>
             <select id="statsExercicioSelect" onchange="atualizarGrafico()" style="margin-bottom: 20px; font-weight: bold;"></select>
-            
             <p style="color: var(--mut); margin: 0 0 10px 0; font-size: 12px; font-weight: bold; text-transform: uppercase;">2. Métrica do Gráfico</p>
             <select id="statsMetricaSelect" onchange="atualizarGrafico()" style="margin-bottom: 30px; font-weight: bold; background: #1c1c1e; border: 1px solid #3a3a3c;">
                 <option value="1rm">🔥 1RM Estimado (Peso + Reps)</option>
                 <option value="max_weight">🏋️ Carga Máxima (Apenas Peso)</option>
                 <option value="volume">📦 Volume de Treino (Peso x Reps)</option>
             </select>
-            
             <h3 id="graficoTitulo" style="margin: 0 0 15px 0; color: white;">Progressão de Carga</h3>
-            <div id="chartContainer" style="width: 100%; height: 250px; position: relative;">
-                <!-- O gráfico entra aqui -->
-            </div>
+            <div id="chartContainer" style="width: 100%; height: 250px; position: relative;"></div>
         </div>
     </div>
 
+    <!-- CRIAR TEMPLATE -->
     <div id="screen-create" class="screen">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h1 style="margin:0;">Criar Rotina</h1>
@@ -148,29 +151,37 @@
             <input type="text" id="novoTemplateNome" placeholder="Nome do Treino (ex: Leg Day)" style="font-size: 18px; font-weight: bold; background: #000;">
             <h4 style="margin: 15px 0 10px 0; color: var(--mut);">Exercícios:</h4>
             <div id="listaExCriacao"></div>
-            <div class="row" style="background: #000; padding: 12px; border-radius: 12px; margin-top: 15px;">
-                <input type="text" id="novoExNome" placeholder="Máquina / Exercício" style="margin:0; background: #1c1c1e;">
-                <input type="text" inputmode="numeric" id="novoExSeries" placeholder="Séries" style="margin:0; width: 80px; background: #1c1c1e;">
-                <button onclick="addExercicioAoTemplate()" class="btn-primary" style="width: 60px; margin: 0; font-size: 20px; padding: 12px;">+</button>
+            <div class="row" style="background: #000; padding: 12px; border-radius: 12px; margin-top: 15px; flex-wrap: wrap;">
+                <input type="text" id="novoExNome" placeholder="Exercício" style="margin:0; background: #1c1c1e; flex: 1 1 100%;">
+                <div style="display: flex; gap: 10px; width: 100%;">
+                    <input type="text" inputmode="numeric" id="novoExSeries" placeholder="Séries" style="margin:0; flex: 1; background: #1c1c1e;">
+                    <input type="text" inputmode="numeric" id="novoExDescanso" placeholder="Descanso (s)" style="margin:0; flex: 1; background: #1c1c1e;">
+                    <button onclick="addExercicioAoTemplate()" class="btn-primary" style="width: 60px; margin: 0; font-size: 20px; padding: 12px;">+</button>
+                </div>
             </div>
             <button onclick="guardarTemplate()" class="btn-primary" style="margin-top: 25px;">Gravar Rotina</button>
         </div>
     </div>
 
+    <!-- LIVE MODE -->
     <div id="screen-live" class="screen">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; position: relative;">
             <button onclick="cancelarTreinoSeguro()" class="btn-text" style="color: var(--danger); padding:0;">Sair</button>
-            <h3 id="liveTitle" style="margin:0; font-size: 17px; font-weight: 700;">Treino</h3>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <h3 id="liveTitle" style="margin:0; font-size: 17px; font-weight: 700;">Treino</h3>
+                <span id="workoutTimerDisplay" style="color: var(--sec); font-size: 14px; font-weight: bold; margin-top: 2px;">00:00</span>
+            </div>
             <button onclick="toggleDropdown()" class="btn-text" style="color: white; font-size: 24px; padding: 0 10px;">⋮</button>
             
             <div id="liveDropdown" class="dropdown">
                 <button onclick="abrirModalTrocar()">🔄 Trocar Máquina</button>
-                <button onclick="finalizarTreino()" style="color: var(--sec);">💾 Finalizar Agora</button>
+                <button onclick="finalizarTreino()" style="color: var(--sec);">💾 Gravar Alterações</button>
             </div>
         </div>
         <div id="liveExercises"></div>
     </div>
 
+    <!-- HISTÓRICO -->
     <div id="screen-history" class="screen">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h1 style="margin:0;">Histórico</h1>
@@ -179,7 +190,6 @@
                 <button id="btnHistCal" onclick="setHistoricoModo('calendario')" style="margin:0; padding: 6px 12px; background: transparent; color: var(--mut); font-size: 13px; border-radius: 8px;">Calendário</button>
             </div>
         </div>
-        
         <div id="viewHistoricoLista"></div>
         <div id="viewHistoricoCal" style="display: none;">
             <div class="card">
@@ -188,20 +198,19 @@
                     <h3 id="calMesAno" style="margin:0; font-size: 16px;">Mês Ano</h3>
                     <button class="btn-text" onclick="mudarMes(1)">&gt;</button>
                 </div>
-                <div class="calendar-grid">
-                    <div class="cal-day-name">D</div><div class="cal-day-name">S</div><div class="cal-day-name">T</div>
-                    <div class="cal-day-name">Q</div><div class="cal-day-name">Q</div><div class="cal-day-name">S</div><div class="cal-day-name">S</div>
-                </div>
+                <div class="calendar-grid"><div class="cal-day-name">D</div><div class="cal-day-name">S</div><div class="cal-day-name">T</div><div class="cal-day-name">Q</div><div class="cal-day-name">Q</div><div class="cal-day-name">S</div><div class="cal-day-name">S</div></div>
                 <div id="calDias" class="calendar-grid"></div>
             </div>
         </div>
     </div>
 
+    <!-- MODAIS -->
     <div id="modalMenuTemplate" class="ui-modal-overlay" style="align-items: flex-end; padding: 0;">
         <div class="ui-modal-box" style="border-radius: 20px 20px 0 0; max-width: 100%; transform: translateY(100%); animation: slideUpModal 0.3s forwards; padding-bottom: env(safe-area-inset-bottom, 30px);">
             <h2 id="menuTemplateTitulo" style="margin-top:5px; margin-bottom: 25px; font-size: 24px;">Nome</h2>
             <button id="btnIniciarTreinoMenu" class="btn-primary" style="margin-bottom: 12px; padding: 16px; font-size: 18px;">Iniciar Treino</button>
             <button id="btnEstatisticasMenu" style="background: #2c2c2e; color: white; margin-bottom: 12px; padding: 16px; font-size: 18px;">Ver Estatísticas</button>
+            <button id="btnApagarTemplateMenu" style="background: rgba(255, 69, 58, 0.1); color: var(--danger); margin-bottom: 12px; padding: 16px; font-size: 18px;">🗑️ Eliminar Template</button>
             <button onclick="fecharMenuTemplate()" class="btn-text" style="color: var(--mut); margin-top: 10px;">Cancelar</button>
         </div>
     </div>
@@ -218,8 +227,8 @@
 
     <div id="modalDetalheTreino" class="ui-modal-overlay">
         <div class="ui-modal-box" style="text-align: left;">
-            <h2 id="detalheTreinoTitulo" style="margin-top:0; margin-bottom: 5px;">Treino</h2>
-            <p id="detalheTreinoData" style="color: var(--primary); font-size: 14px; margin: 0 0 20px 0; font-weight: bold;"></p>
+            <h2 id="detalheTreinoTitulo" style="margin-top:0; margin-bottom: 5px;">Treinos</h2>
+            <p id="detalheTreinoData" style="color: var(--primary); font-size: 14px; margin: 0 0 15px 0; font-weight: bold; text-transform: capitalize;"></p>
             <div id="detalheTreinoCorpo" style="margin-bottom: 20px;"></div>
             <button onclick="fecharDetalheTreino()" class="btn-primary">Fechar</button>
         </div>
@@ -242,7 +251,7 @@
     </nav>
 
     <script>
-        const API_URL = 'http://192.168.100.175:8000';
+        const API_URL = ''; 
         let treinoAtual = null;
         let templateEmCriacao = [];
         let exercicioAtualIndex = 0; 
@@ -250,468 +259,374 @@
         let uiConfirmResolve = null;
         let todosTreinosHistorico = []; 
         let currentCalDate = new Date(); 
-        
         let graficoChart = null;
+        let editandoTreinoId = null;
 
-        function showToast(mensagem, icone = "ℹ️") {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = 'toast'; toast.innerHTML = `<span>${icone}</span> <span>${mensagem}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0'; toast.style.transform = 'translateY(-20px)'; toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
+        let workoutStartTime = null;
+        let workoutTimerInterval = null;
+        let restEndTime = null;
+        let restTimerInterval = null;
 
-        function uiConfirm(title, text, confirmBtnText = "Confirmar", isDanger = false) {
-            document.getElementById('ui-confirm-title').innerText = title; document.getElementById('ui-confirm-text').innerText = text;
-            const btn = document.getElementById('ui-confirm-btn');
-            btn.innerText = confirmBtnText; btn.style.background = isDanger ? 'var(--danger)' : 'var(--primary)';
-            document.getElementById('ui-confirm-modal').style.display = 'flex';
-            return new Promise(resolve => { uiConfirmResolve = resolve; });
-        }
-        function closeUiConfirm(result) {
-            document.getElementById('ui-confirm-modal').style.display = 'none';
-            if (uiConfirmResolve) { uiConfirmResolve(result); uiConfirmResolve = null; }
+        function formatTime(seconds) {
+            let h = Math.floor(seconds / 3600); let m = Math.floor((seconds % 3600) / 60); let s = seconds % 60;
+            if(h > 0) return `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
         }
 
-        function guardarEstadoLocal() { if (treinoAtual) localStorage.setItem('treinoEmCurso', JSON.stringify({ treino: treinoAtual, index: exercicioAtualIndex })); }
-        function verificarTreinoEmCurso() {
-            const salvo = localStorage.getItem('treinoEmCurso');
-            document.getElementById('activeWorkoutBanner').style.display = salvo ? 'block' : 'none';
+        function startWorkoutTimer(savedStartTime = null) {
+            workoutStartTime = savedStartTime || Date.now();
+            if (workoutTimerInterval) clearInterval(workoutTimerInterval);
+            workoutTimerInterval = setInterval(() => {
+                let diff = Math.floor((Date.now() - workoutStartTime) / 1000);
+                document.getElementById('workoutTimerDisplay').innerText = formatTime(diff);
+            }, 1000);
         }
+
+        function startRestTimer(seconds) {
+            if(!seconds || seconds <= 0) return;
+            restEndTime = Date.now() + (seconds * 1000);
+            document.getElementById('restTimerBanner').style.display = 'flex';
+            document.getElementById('restTimerBanner').style.background = 'var(--primary)';
+            document.getElementById('restTimerBanner').style.color = 'white';
+            if(restTimerInterval) clearInterval(restTimerInterval);
+            restTimerInterval = setInterval(updateRestTimer, 1000);
+            updateRestTimer();
+        }
+
+        function updateRestTimer() {
+            let diff = Math.floor((restEndTime - Date.now()) / 1000);
+            if(diff <= 0) {
+                clearInterval(restTimerInterval);
+                document.getElementById('restTimerText').innerText = "00:00 - Vamos lá!";
+                document.getElementById('restTimerBanner').style.background = 'var(--sec)';
+                document.getElementById('restTimerBanner').style.color = '#000';
+                setTimeout(() => { fecharRestTimer(); }, 3500);
+            } else { document.getElementById('restTimerText').innerText = formatTime(diff); }
+        }
+
+        function fecharRestTimer() { document.getElementById('restTimerBanner').style.display = 'none'; if(restTimerInterval) clearInterval(restTimerInterval); }
+
+        function showToast(m, i = "ℹ️") { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = 'toast'; t.innerHTML = `<span>${i}</span> <span>${m}</span>`; c.appendChild(t); setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(-20px)'; setTimeout(() => t.remove(), 300); }, 3500); }
+        function uiConfirm(t, tx, bt = "Confirmar", d = false) { document.getElementById('ui-confirm-title').innerText = t; document.getElementById('ui-confirm-text').innerText = tx; const b = document.getElementById('ui-confirm-btn'); b.innerText = bt; b.style.background = d ? 'var(--danger)' : 'var(--primary)'; document.getElementById('ui-confirm-modal').style.display = 'flex'; return new Promise(r => { uiConfirmResolve = r; }); }
+        function closeUiConfirm(res) { document.getElementById('ui-confirm-modal').style.display = 'none'; if (uiConfirmResolve) { uiConfirmResolve(res); uiConfirmResolve = null; } }
+
+        function guardarEstadoLocal() { 
+            if (treinoAtual && !editandoTreinoId) localStorage.setItem('treinoEmCurso', JSON.stringify({ treino: treinoAtual, index: exercicioAtualIndex, startTime: workoutStartTime })); 
+        }
+        function verificarTreinoEmCurso() { const salvo = localStorage.getItem('treinoEmCurso'); document.getElementById('activeWorkoutBanner').style.display = salvo ? 'block' : 'none'; }
+        
         function retomarTreino() {
             const salvo = JSON.parse(localStorage.getItem('treinoEmCurso'));
-            if (salvo) { treinoAtual = salvo.treino; exercicioAtualIndex = salvo.index; mostrarEcra('screen-live'); document.getElementById('liveTitle').innerText = treinoAtual.routine_name; renderizarLiveMode(); }
-        }
-        async function apagarTreinoInterrompido() {
-            if(await uiConfirm("Descartar Treino", "O progresso gravado até agora será apagado.", "Descartar", true)) {
-                localStorage.removeItem('treinoEmCurso'); verificarTreinoEmCurso(); showToast("Treino descartado", "🗑️");
+            if (salvo) { 
+                treinoAtual = salvo.treino; exercicioAtualIndex = salvo.index; editandoTreinoId = null;
+                mostrarEcra('screen-live'); document.getElementById('liveTitle').innerText = treinoAtual.routine_name; 
+                startWorkoutTimer(salvo.startTime); renderizarLiveMode(); 
             }
         }
-        async function cancelarTreinoSeguro() {
-            if(await uiConfirm("Sair do Treino?", "Todo o progresso de hoje será perdido se saíres agora.", "Sair", true)) {
-                localStorage.removeItem('treinoEmCurso'); treinoAtual = null; voltarHome();
+        
+        async function apagarTreinoInterrompido() { if(await uiConfirm("Descartar Treino", "O progresso gravado até agora será apagado.", "Descartar", true)) { localStorage.removeItem('treinoEmCurso'); verificarTreinoEmCurso(); showToast("Treino descartado", "🗑️"); } }
+        
+        async function cancelarTreinoSeguro() { 
+            if(editandoTreinoId) {
+                editandoTreinoId = null; treinoAtual = null; voltarHome(); return;
             }
+            if(await uiConfirm("Sair do Treino?", "Todo o progresso de hoje será perdido se saíres agora.", "Sair", true)) { localStorage.removeItem('treinoEmCurso'); treinoAtual = null; if(workoutTimerInterval) clearInterval(workoutTimerInterval); fecharRestTimer(); voltarHome(); } 
         }
 
         function mostrarEcra(id) {
-            document.querySelectorAll('.screen').forEach(e => e.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.screen').forEach(e => e.classList.remove('active')); document.getElementById(id).classList.add('active');
             document.getElementById('bottomNav').style.display = (id === 'screen-live' || id === 'screen-create' || id === 'screen-stats') ? 'none' : 'flex';
-            if(id === 'screen-home') {
-                document.getElementById('tab-home').classList.add('active'); document.getElementById('tab-history').classList.remove('active'); verificarTreinoEmCurso();
-            } else if (id === 'screen-history') {
-                document.getElementById('tab-history').classList.add('active'); document.getElementById('tab-home').classList.remove('active');
-            }
+            if(id === 'screen-home') { document.getElementById('tab-home').classList.add('active'); document.getElementById('tab-history').classList.remove('active'); verificarTreinoEmCurso(); } else if (id === 'screen-history') { document.getElementById('tab-history').classList.add('active'); document.getElementById('tab-home').classList.remove('active'); }
         }
         function voltarHome() { mostrarEcra('screen-home'); carregarTemplates(); }
 
-        // ======= TEMPLATES =======
         async function carregarTemplates() {
             try {
-                const response = await fetch(`${API_URL}/templates/`);
-                const templates = await response.json();
-                const lista = document.getElementById('templatesList');
-                lista.innerHTML = '';
+                const response = await fetch(`${API_URL}/templates/`); const templates = await response.json(); const lista = document.getElementById('templatesList'); lista.innerHTML = '';
                 if(templates.length === 0) lista.innerHTML = '<p style="color: var(--mut); text-align:center; padding: 20px;">Nenhuma rotina criada.</p>';
                 templates.forEach(t => {
                     let resumo = t.exercises.map(ex => typeof ex === 'string' ? ex : `${ex.name} (${ex.target_sets || 3}s)`).join(' • ');
-                    lista.innerHTML += `
-                        <div class="card" onclick='abrirMenuTemplate(${JSON.stringify(t.name)}, ${JSON.stringify(t.exercises)})' style="cursor:pointer;">
-                            <h3 style="margin:0 0 8px 0; font-size:18px;">${t.name}</h3>
-                            <p style="color: var(--mut); font-size: 13px; margin: 0; line-height: 1.4;">${resumo}</p>
-                        </div>`;
+                    lista.innerHTML += `<div class="card" onclick='abrirMenuTemplate(${t.id}, ${JSON.stringify(t.name)}, ${JSON.stringify(t.exercises)})' style="cursor:pointer;"><h3 style="margin:0 0 8px 0; font-size:18px;">${t.name}</h3><p style="color: var(--mut); font-size: 13px; margin: 0; line-height: 1.4;">${resumo}</p></div>`;
                 });
             } catch (e) {}
         }
-
-        function abrirMenuTemplate(nome, exercicios) {
-            document.getElementById('menuTemplateTitulo').innerText = nome;
-            const btnIniciar = document.getElementById('btnIniciarTreinoMenu');
-            btnIniciar.onclick = () => { fecharMenuTemplate(); iniciarLiveMode(nome, exercicios); };
-            const btnStats = document.getElementById('btnEstatisticasMenu');
-            btnStats.onclick = () => { fecharMenuTemplate(); iniciarEstatisticasTemplate(nome, exercicios); };
+        
+        function abrirMenuTemplate(id, n, ex) {
+            document.getElementById('menuTemplateTitulo').innerText = n;
+            document.getElementById('btnIniciarTreinoMenu').onclick = () => { fecharMenuTemplate(); iniciarLiveMode(n, ex); };
+            document.getElementById('btnEstatisticasMenu').onclick = () => { fecharMenuTemplate(); iniciarEstatisticasTemplate(n, ex); };
+            document.getElementById('btnApagarTemplateMenu').onclick = () => { fecharMenuTemplate(); apagarTemplate(id); };
             document.getElementById('modalMenuTemplate').style.display = 'flex';
         }
         function fecharMenuTemplate() { document.getElementById('modalMenuTemplate').style.display = 'none'; }
 
-        // ======= MÁGICA DOS GRÁFICOS DINÂMICOS =======
-        async function iniciarEstatisticasTemplate(nome, exercicios) {
-            mostrarEcra('screen-stats');
-            document.getElementById('statsTitle').innerText = nome;
-            
-            const select = document.getElementById('statsExercicioSelect');
-            select.innerHTML = exercicios.map(ex => {
-                let exName = typeof ex === 'string' ? ex : ex.name;
-                return `<option value="${exName}">${exName}</option>`;
-            }).join('');
-            
-            if (todosTreinosHistorico.length === 0) {
-                try {
-                    const response = await fetch(`${API_URL}/treinos/`);
-                    todosTreinosHistorico = await response.json();
-                } catch(e) {}
+        async function apagarTemplate(id) {
+            if(await uiConfirm("Eliminar Rotina?", "Esta ação não pode ser revertida.", "Eliminar", true)) {
+                try { await fetch(`${API_URL}/templates/${id}`, { method: 'DELETE' }); showToast("Rotina eliminada", "🗑️"); carregarTemplates(); } catch(e) { showToast("Erro de ligação", "❌"); }
             }
-            
-            atualizarGrafico();
         }
 
-        function atualizarGrafico() {
-            const exercicioNome = document.getElementById('statsExercicioSelect').value;
-            const metrica = document.getElementById('statsMetricaSelect').value;
-            let dadosDoGrafico = [];
-            
-            let historicoOrdenadoTemp = [...todosTreinosHistorico].reverse();
-
-            historicoOrdenadoTemp.forEach(treino => {
-                let exEncontrado = treino.exercises.find(e => e.name.toLowerCase() === exercicioNome.toLowerCase());
-                if (exEncontrado && exEncontrado.sets && exEncontrado.sets.length > 0) {
-                    let valor = 0;
-                    
-                    if (metrica === 'max_weight') {
-                        valor = Math.max(...exEncontrado.sets.map(s => s.weight_kg));
-                        document.getElementById('graficoTitulo').innerText = "Carga Máxima (Kg)";
-                    } else if (metrica === '1rm') {
-                        // Fórmula de Epley: Peso x (1 + Reps/30)
-                        let max1RM = Math.max(...exEncontrado.sets.map(s => s.weight_kg * (1 + s.reps / 30)));
-                        valor = Math.round(max1RM * 10) / 10; // Arredonda para 1 casa decimal
-                        document.getElementById('graficoTitulo').innerText = "1RM Estimado (Kg)";
-                    } else if (metrica === 'volume') {
-                        valor = exEncontrado.sets.reduce((total, s) => total + (s.weight_kg * s.reps), 0);
-                        document.getElementById('graficoTitulo').innerText = "Volume Total (Kg movidos)";
-                    }
-
-                    let dataAbreviada = new Date(treino.date).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' });
-                    dadosDoGrafico.push({ data: dataAbreviada, valor: valor });
-                }
-            });
-
-            if (graficoChart) { graficoChart.destroy(); }
-
-            const container = document.getElementById('chartContainer');
-
-            if (dadosDoGrafico.length === 0) {
-                container.innerHTML = '<p style="color:var(--mut); text-align:center; padding-top: 50px; font-size:15px;">Ainda não há dados para gerar este gráfico.</p>';
-                return;
-            }
-
-            container.innerHTML = '<canvas id="progressChartCanvas"></canvas>';
-            const ctx = document.getElementById('progressChartCanvas').getContext('2d');
-
-            let chartLabel = metrica === 'volume' ? 'Volume' : 'Kg';
-            let lineColor = metrica === '1rm' ? '#FF9500' : (metrica === 'max_weight' ? '#4e80ee' : '#30D158'); // Cores diferentes por métrica
-            let bgColor = metrica === '1rm' ? 'rgba(255, 149, 0, 0.1)' : (metrica === 'max_weight' ? 'rgba(78, 128, 238, 0.1)' : 'rgba(48, 209, 88, 0.1)');
-
-            graficoChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dadosDoGrafico.map(d => d.data),
-                    datasets: [{
-                        label: chartLabel,
-                        data: dadosDoGrafico.map(d => d.valor),
-                        borderColor: lineColor,
-                        backgroundColor: bgColor,
-                        borderWidth: 3,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: lineColor,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        fill: true,
-                        tension: 0.3 
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1c1c1e', titleFont: {size: 14}, bodyFont: {size: 14, weight: 'bold'}, displayColors: false } },
-                    scales: {
-                        y: { grid: { color: '#2c2c2e', drawBorder: false }, ticks: { color: '#8e8e93', font: {size: 12}, padding: 10 } },
-                        x: { grid: { display: false }, ticks: { color: '#8e8e93', font: {size: 12} } }
-                    },
-                    layout: { padding: { left: 0, right: 10, top: 10, bottom: 0 } }
-                }
-            });
-        }
-
-        // ======= CRIAR TEMPLATES =======
         function abrirCriadorTemplate() { templateEmCriacao = []; document.getElementById('novoTemplateNome').value = ''; atualizarListaCriacao(); mostrarEcra('screen-create'); }
         function addExercicioAoTemplate() {
             const nome = document.getElementById('novoExNome').value;
             const series = parseInt(document.getElementById('novoExSeries').value.replace(/[^0-9]/g, '')) || 3;
+            const descanso = parseInt(document.getElementById('novoExDescanso').value.replace(/[^0-9]/g, '')) || 0; 
             if(!nome) return showToast("Dá um nome ao exercício", "⚠️");
-            templateEmCriacao.push({ name: nome, target_sets: series });
-            document.getElementById('novoExNome').value = ''; document.getElementById('novoExSeries').value = ''; atualizarListaCriacao();
+            templateEmCriacao.push({ name: nome, target_sets: series, rest_seconds: descanso });
+            document.getElementById('novoExNome').value = ''; document.getElementById('novoExSeries').value = ''; document.getElementById('novoExDescanso').value = ''; atualizarListaCriacao();
         }
         function atualizarListaCriacao() {
-            const lista = document.getElementById('listaExCriacao');
-            lista.innerHTML = templateEmCriacao.length === 0 ? '<span style="font-size: 14px; color:#555;">Adiciona exercícios abaixo...</span>' : '';
+            const lista = document.getElementById('listaExCriacao'); lista.innerHTML = templateEmCriacao.length === 0 ? '<span style="font-size: 14px; color:#555;">Adiciona exercícios abaixo...</span>' : '';
             templateEmCriacao.forEach((ex, i) => {
-                lista.innerHTML += `<div class="list-item"><span><strong style="color:var(--primary);">${ex.name}</strong> <span style="color:var(--mut); font-size:14px; margin-left:5px;">${ex.target_sets} séries</span></span><button onclick="removerExTemplate(${i})" style="background:rgba(255, 69, 58, 0.2); color:var(--danger); width:36px; height:36px; border-radius:10px; padding:0; margin:0; display:flex; align-items:center; justify-content:center;">✕</button></div>`;
+                let restTxt = ex.rest_seconds > 0 ? ` ⏱️ ${ex.rest_seconds}s` : '';
+                lista.innerHTML += `<div class="list-item"><span><strong style="color:var(--primary);">${ex.name}</strong> <span style="color:var(--mut); font-size:14px; margin-left:5px;">${ex.target_sets} séries${restTxt}</span></span><button onclick="removerExTemplate(${i})" style="background:rgba(255, 69, 58, 0.2); color:var(--danger); width:36px; height:36px; border-radius:10px; padding:0; margin:0; display:flex; align-items:center; justify-content:center;">✕</button></div>`;
             });
         }
         function removerExTemplate(index) { templateEmCriacao.splice(index, 1); atualizarListaCriacao(); }
         async function guardarTemplate() {
-            const nome = document.getElementById('novoTemplateNome').value;
-            if(!nome || templateEmCriacao.length === 0) return showToast("Dá um nome e adiciona exercícios", "⚠️");
-            try {
-                await fetch(`${API_URL}/templates/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: nome, exercises: templateEmCriacao }) });
-                showToast("Rotina guardada", "✅"); voltarHome();
-            } catch (e) { showToast("Erro de ligação", "❌"); }
+            const n = document.getElementById('novoTemplateNome').value; if(!n || templateEmCriacao.length === 0) return showToast("Dá um nome e adiciona exercícios", "⚠️");
+            try { await fetch(`${API_URL}/templates/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: n, exercises: templateEmCriacao }) }); showToast("Rotina guardada", "✅"); voltarHome(); } catch (e) { showToast("Erro de ligação", "❌"); }
         }
 
-        // ======= LIVE MODE =======
+        async function iniciarEstatisticasTemplate(nome, exercicios) {
+            mostrarEcra('screen-stats'); document.getElementById('statsTitle').innerText = nome;
+            document.getElementById('statsExercicioSelect').innerHTML = exercicios.map(ex => { let exName = typeof ex === 'string' ? ex : ex.name; return `<option value="${exName}">${exName}</option>`; }).join('');
+            if (todosTreinosHistorico.length === 0) { try { todosTreinosHistorico = await (await fetch(`${API_URL}/treinos/`)).json(); } catch(e) {} }
+            atualizarGrafico();
+        }
+        function atualizarGrafico() {
+            const exNome = document.getElementById('statsExercicioSelect').value; const met = document.getElementById('statsMetricaSelect').value; let dados = [];
+            [...todosTreinosHistorico].reverse().forEach(t => {
+                let exEnc = t.exercises.find(e => e.name.toLowerCase() === exNome.toLowerCase());
+                if (exEnc && exEnc.sets && exEnc.sets.length > 0) {
+                    let valor = 0;
+                    if (met === 'max_weight') { valor = Math.max(...exEnc.sets.map(s => s.weight_kg)); document.getElementById('graficoTitulo').innerText = "Carga Máxima (Kg)"; } 
+                    else if (met === '1rm') { valor = Math.round(Math.max(...exEnc.sets.map(s => s.weight_kg * (1 + s.reps / 30))) * 10) / 10; document.getElementById('graficoTitulo').innerText = "1RM Estimado (Kg)"; } 
+                    else if (met === 'volume') { valor = exEnc.sets.reduce((tot, s) => tot + (s.weight_kg * s.reps), 0); document.getElementById('graficoTitulo').innerText = "Volume Total (Kg movidos)"; }
+                    dados.push({ data: new Date(t.date).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short' }), valor: valor });
+                }
+            });
+            if (graficoChart) graficoChart.destroy();
+            const container = document.getElementById('chartContainer');
+            if (dados.length === 0) { container.innerHTML = '<p style="color:var(--mut); text-align:center; padding-top: 50px; font-size:15px;">Sem dados suficientes.</p>'; return; }
+            container.innerHTML = '<canvas id="progressChartCanvas"></canvas>';
+            let cor = met === '1rm' ? '#FF9500' : (met === 'max_weight' ? '#4e80ee' : '#30D158'); 
+            let bg = met === '1rm' ? 'rgba(255, 149, 0, 0.1)' : (met === 'max_weight' ? 'rgba(78, 128, 238, 0.1)' : 'rgba(48, 209, 88, 0.1)');
+            graficoChart = new Chart(document.getElementById('progressChartCanvas').getContext('2d'), { type: 'line', data: { labels: dados.map(d => d.data), datasets: [{ label: met === 'volume' ? 'Volume' : 'Kg', data: dados.map(d => d.valor), borderColor: cor, backgroundColor: bg, borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: cor, pointRadius: 5, fill: true, tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#2c2c2e', drawBorder: false } }, x: { grid: { display: false } } } } });
+        }
+
         function tentarAutoSave() {
             const kgInput = document.getElementById('current_weight'); const repsInput = document.getElementById('current_reps');
             if (kgInput && repsInput) {
                 let kgClean = kgInput.value.replace(/[^0-9.,]/g, '').replace(',', '.'); let repsClean = repsInput.value.replace(/[^0-9]/g, '');
-                if (kgClean && repsClean) {
-                    treinoAtual.exercises[exercicioAtualIndex].sets.push({ weight_kg: parseFloat(kgClean), reps: parseInt(repsClean) }); return true;
-                } else if (kgInput.value.trim() !== '' || repsInput.value.trim() !== '') {
-                    showToast("Preenche os dois valores ou apaga.", "⚠️"); return false;
-                }
+                if (kgClean && repsClean) { treinoAtual.exercises[exercicioAtualIndex].sets.push({ weight_kg: parseFloat(kgClean), reps: parseInt(repsClean) }); return true; } 
+                else if (kgInput.value.trim() !== '' || repsInput.value.trim() !== '') { showToast("Preenche os dois valores ou apaga.", "⚠️"); return false; }
             }
             return true;
         }
-
         function toggleDropdown() { const dp = document.getElementById('liveDropdown'); dp.style.display = dp.style.display === 'flex' ? 'none' : 'flex'; }
         function fecharDropdown() { document.getElementById('liveDropdown').style.display = 'none'; }
-
+        
         function abrirModalTrocar() {
-            fecharDropdown();
-            const lista = document.getElementById('listaTrocarEx'); lista.innerHTML = '';
-            let temOpcoes = false;
+            fecharDropdown(); const lista = document.getElementById('listaTrocarEx'); lista.innerHTML = ''; let tem = false;
             for (let i = exercicioAtualIndex + 1; i < treinoAtual.exercises.length; i++) {
-                temOpcoes = true;
-                lista.innerHTML += `
-                    <div style="background: #2c2c2e; padding: 14px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: 600;">${treinoAtual.exercises[i].name}</span>
-                        <button onclick="fazerExercicioAgora(${i})" class="btn-outline" style="padding: 6px 12px; font-size: 13px; border-radius: 6px; width: auto;">Fazer agora</button>
-                    </div>`;
+                tem = true; lista.innerHTML += `<div style="background: #2c2c2e; padding: 14px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: 600;">${treinoAtual.exercises[i].name}</span><button onclick="fazerExercicioAgora(${i})" class="btn-outline" style="padding: 6px 12px; font-size: 13px; border-radius: 6px; width: auto;">Fazer agora</button></div>`;
             }
-            if(!temOpcoes) { lista.innerHTML = '<p style="color: var(--mut); font-size:14px;">Não há mais exercícios à frente para trocar.</p>'; }
+            if(!tem) lista.innerHTML = '<p style="color: var(--mut); font-size:14px;">Não há mais exercícios à frente para trocar.</p>';
             document.getElementById('modalTrocarEx').style.display = 'flex';
         }
         function fecharModalTrocar() { document.getElementById('modalTrocarEx').style.display = 'none'; }
-
+        
         function fazerExercicioAgora(alvoIndex) {
-            let temp = treinoAtual.exercises[exercicioAtualIndex];
-            treinoAtual.exercises[exercicioAtualIndex] = treinoAtual.exercises[alvoIndex];
-            treinoAtual.exercises[alvoIndex] = temp;
+            let temp = treinoAtual.exercises[exercicioAtualIndex]; treinoAtual.exercises[exercicioAtualIndex] = treinoAtual.exercises[alvoIndex]; treinoAtual.exercises[alvoIndex] = temp;
             fecharModalTrocar(); guardarEstadoLocal(); renderizarLiveMode(); showToast("Exercício trocado", "🔄");
         }
 
         async function iniciarLiveMode(nome, exerciciosLista) {
             mostrarEcra('screen-live'); document.getElementById('liveTitle').innerText = nome;
-            exercicioAtualIndex = 0; 
+            exercicioAtualIndex = 0; editandoTreinoId = null;
             treinoAtual = { routine_name: nome, exercises: exerciciosLista.map(ex => {
-                let exName = typeof ex === 'string' ? ex : ex.name; let targetSets = typeof ex === 'string' ? 3 : (ex.target_sets || 3);
-                return { name: exName, target_sets: targetSets, sets: [], history: [] };
+                let exName = typeof ex === 'string' ? ex : ex.name; 
+                let targetSets = typeof ex === 'string' ? 3 : (ex.target_sets || 3);
+                let restSecs = typeof ex === 'string' ? 0 : (ex.rest_seconds || 0);
+                return { name: exName, target_sets: targetSets, rest_seconds: restSecs, sets: [], history: [] };
             }) };
-            guardarEstadoLocal(); 
+            
+            startWorkoutTimer(); guardarEstadoLocal(); 
+            
             for (let i = 0; i < treinoAtual.exercises.length; i++) {
                 try {
-                    let resp = await fetch(`${API_URL}/historico/${treinoAtual.exercises[i].name}`);
-                    let data = await resp.json();
+                    let resp = await fetch(`${API_URL}/historico/${treinoAtual.exercises[i].name}`); let data = await resp.json();
                     if(data && data.sets) { treinoAtual.exercises[i].history = data.sets; guardarEstadoLocal(); }
                 } catch(e) { }
             }
             renderizarLiveMode();
         }
 
-        function navegarExercicio(direcao) { if (!tentarAutoSave()) return; fecharDropdown(); exercicioAtualIndex += direcao; guardarEstadoLocal(); renderizarLiveMode(); }
-
-        function desfazerUltimaSerie() {
-            if (treinoAtual.exercises[exercicioAtualIndex].sets.length > 0) {
-                treinoAtual.exercises[exercicioAtualIndex].sets.pop();
-                guardarEstadoLocal(); renderizarLiveMode(); showToast("Série removida", "↩️");
-            }
-        }
+        function navegarExercicio(direcao) { if (!tentarAutoSave()) return; fecharDropdown(); exercicioAtualIndex += direcao; fecharRestTimer(); guardarEstadoLocal(); renderizarLiveMode(); }
+        function desfazerUltimaSerie() { if (treinoAtual.exercises[exercicioAtualIndex].sets.length > 0) { treinoAtual.exercises[exercicioAtualIndex].sets.pop(); fecharRestTimer(); guardarEstadoLocal(); renderizarLiveMode(); showToast("Série removida", "↩️"); } }
 
         function renderizarLiveMode() {
-            const container = document.getElementById('liveExercises');
-            if (!treinoAtual || treinoAtual.exercises.length === 0) return;
-
-            const exercicio = treinoAtual.exercises[exercicioAtualIndex];
-            const currentSetIndex = exercicio.sets.length;
+            const container = document.getElementById('liveExercises'); if (!treinoAtual || treinoAtual.exercises.length === 0) return;
+            const exercicio = treinoAtual.exercises[exercicioAtualIndex]; const currentSetIndex = exercicio.sets.length;
             
             let textoHistorico = "Primeira vez a registar.";
             if (exercicio.history && exercicio.history.length > 0) {
-                if (currentSetIndex < exercicio.history.length) {
-                    let histS = exercicio.history[currentSetIndex];
-                    textoHistorico = `Série ${currentSetIndex + 1}: <strong style="color:white;">${histS.weight_kg}kg × ${histS.reps}</strong>`;
-                } else { textoHistorico = `Já superaste o volume anterior!`; }
+                if (currentSetIndex < exercicio.history.length) { textoHistorico = `Série ${currentSetIndex + 1}: <strong style="color:white;">${exercicio.history[currentSetIndex].weight_kg}kg × ${exercicio.history[currentSetIndex].reps}</strong>`; } 
+                else { textoHistorico = `Já superaste o volume anterior!`; }
             }
 
-            let setsHTML = exercicio.sets.map((s, i) => `
-                <div class="set-row">
-                    <div class="set-number">${i + 1}</div>
-                    <div class="set-weight">${s.weight_kg} kg <span style="color:#666; font-size:14px; margin: 0 4px;">×</span> ${s.reps}</div>
-                    <div class="set-check">✓</div>
-                </div>
-            `).join('');
-            
+            let setsHTML = exercicio.sets.map((s, i) => `<div class="set-row"><div class="set-number">${i + 1}</div><div class="set-weight">${s.weight_kg} kg <span style="color:#666; font-size:14px; margin: 0 4px;">×</span> ${s.reps}</div><div class="set-check">✓</div></div>`).join('');
             let isLastEx = exercicioAtualIndex === treinoAtual.exercises.length - 1;
             let btnNextTopHTML = isLastEx ? `<span style="width: 70px;"></span>` : `<button class="btn-nav-ex" onclick="navegarExercicio(1)">Próx &gt;</button>`;
 
-            let headerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 5px;">
-                    <button class="btn-nav-ex" onclick="navegarExercicio(-1)" ${exercicioAtualIndex === 0 ? 'style="visibility:hidden;"' : ''}>&lt; Ant</button>
-                    <span style="font-size: 14px; font-weight: 700; color: var(--mut); background: #2c2c2e; padding: 6px 14px; border-radius: 20px;">
-                        ${exercicioAtualIndex + 1} de ${treinoAtual.exercises.length}
-                    </span>
-                    ${btnNextTopHTML}
-                </div>
-            `;
+            let headerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 5px;"><button class="btn-nav-ex" onclick="navegarExercicio(-1)" ${exercicioAtualIndex === 0 ? 'style="visibility:hidden;"' : ''}>&lt; Ant</button><span style="font-size: 14px; font-weight: 700; color: var(--mut); background: #2c2c2e; padding: 6px 14px; border-radius: 20px;">${exercicioAtualIndex + 1} de ${treinoAtual.exercises.length}</span>${btnNextTopHTML}</div>`;
 
-            let hasTarget = exercicio.target_sets && exercicio.target_sets > 0;
-            let isDone = hasTarget && currentSetIndex >= exercicio.target_sets;
-            let inputAreaHTML = '';
+            let hasTarget = exercicio.target_sets && exercicio.target_sets > 0; let isDone = hasTarget && currentSetIndex >= exercicio.target_sets; let inputAreaHTML = '';
             let btnUndo = currentSetIndex > 0 ? `<button onclick="desfazerUltimaSerie()" style="background: #2c2c2e; color: white; border-radius: 12px; width: 60px; height: 53px; margin:0; margin-bottom: 8px; font-size: 18px;">⎌</button>` : '';
 
             if (isDone) {
-                let actionBtn = isLastEx 
-                    ? `<button class="btn-primary" style="margin-top: 15px; padding: 18px; font-size: 18px; border-radius:16px;" onclick="finalizarTreino()">Concluir Treino</button>`
-                    : `<button class="btn-primary" style="margin-top: 15px; padding: 18px; border-radius:16px;" onclick="navegarExercicio(1)">Próximo Exercício</button>`;
-                inputAreaHTML = `
-                    <div style="background: rgba(48, 209, 88, 0.1); padding: 24px; border-radius: 16px; text-align: center; border: 1px solid rgba(48, 209, 88, 0.3); margin-top: 25px; position:relative;">
-                        ${currentSetIndex > 0 ? `<button onclick="desfazerUltimaSerie()" class="btn-text" style="position:absolute; top: 10px; right: 10px; color: var(--mut); padding:5px; font-size: 20px;">⎌</button>` : ''}
-                        <div style="font-size:32px; margin-bottom:10px;">🏆</div>
-                        <h3 style="margin: 0 0 5px 0; color: var(--sec);">Todas as séries feitas</h3>
-                        ${actionBtn}
-                    </div>
-                `;
+                let actionBtn = isLastEx ? `<button class="btn-primary" style="margin-top: 15px; padding: 18px; font-size: 18px; border-radius:16px;" onclick="finalizarTreino()">Gravar Treino</button>` : `<button class="btn-primary" style="margin-top: 15px; padding: 18px; border-radius:16px;" onclick="navegarExercicio(1)">Próximo Exercício</button>`;
+                inputAreaHTML = `<div style="background: rgba(48, 209, 88, 0.1); padding: 24px; border-radius: 16px; text-align: center; border: 1px solid rgba(48, 209, 88, 0.3); margin-top: 25px; position:relative;">${currentSetIndex > 0 ? `<button onclick="desfazerUltimaSerie()" class="btn-text" style="position:absolute; top: 10px; right: 10px; color: var(--mut); padding:5px; font-size: 20px;">⎌</button>` : ''}<div style="font-size:32px; margin-bottom:10px;">🏆</div><h3 style="margin: 0 0 5px 0; color: var(--sec);">Todas as séries feitas</h3>${actionBtn}</div>`;
             } else {
-                inputAreaHTML = `
-                    <div class="row" style="margin-top: 25px; gap:8px;">
-                        ${btnUndo}
-                        <input type="text" inputmode="decimal" id="current_weight" placeholder="Kg" style="text-align:center; font-size:18px; font-weight:bold; background:#1c1c1e; border: 1px solid #3a3a3c;">
-                        <input type="text" inputmode="numeric" id="current_reps" placeholder="Reps" style="text-align:center; font-size:18px; font-weight:bold; background:#1c1c1e; border: 1px solid #3a3a3c;">
-                        <button class="btn-primary" style="width: 60px; height: 53px; border-radius:12px; margin:0; margin-bottom:8px;" onclick="registarSerie()">✓</button>
-                    </div>
-                `;
+                inputAreaHTML = `<div class="row" style="margin-top: 25px; gap:8px;">${btnUndo}<input type="text" inputmode="decimal" id="current_weight" placeholder="Kg" style="text-align:center; font-size:18px; font-weight:bold; background:#1c1c1e; border: 1px solid #3a3a3c;"><input type="text" inputmode="numeric" id="current_reps" placeholder="Reps" style="text-align:center; font-size:18px; font-weight:bold; background:#1c1c1e; border: 1px solid #3a3a3c;"><button class="btn-primary" style="width: 60px; height: 53px; border-radius:12px; margin:0; margin-bottom:8px;" onclick="registarSerie()">✓</button></div>`;
             }
 
-            container.innerHTML = headerHTML + `
-                <div class="exercise-card">
-                    <h2 style="margin: 0 0 15px 0; font-size:22px; font-weight:800; letter-spacing:-0.5px;">${exercicio.name} <span style="color:var(--mut); font-size:16px; font-weight:600; display:block; margin-top:4px;">${exercicio.target_sets} séries alvo</span></h2>
-                    <div class="history-box"><span style="font-size:16px;">🕰️</span> ${textoHistorico}</div>
-                    <div style="margin-top: 20px;">${setsHTML}</div>
-                    ${inputAreaHTML}
-                </div>
-            `;
+            container.innerHTML = headerHTML + `<div class="exercise-card"><h2 style="margin: 0 0 15px 0; font-size:22px; font-weight:800; letter-spacing:-0.5px;">${exercicio.name} <span style="color:var(--mut); font-size:16px; font-weight:600; display:block; margin-top:4px;">${exercicio.target_sets} séries alvo</span></h2><div class="history-box"><span style="font-size:16px;">🕰️</span> ${textoHistorico}</div><div style="margin-top: 20px;">${setsHTML}</div>${inputAreaHTML}</div>`;
         }
 
         function registarSerie() {
             let kgRaw = document.getElementById('current_weight').value; let repsRaw = document.getElementById('current_reps').value;
             let kgClean = kgRaw.replace(/[^0-9.,]/g, '').replace(',', '.'); let repsClean = repsRaw.replace(/[^0-9]/g, '');
             if(!kgClean || !repsClean) return showToast("Faltam valores na série!", "⚠️");
-            treinoAtual.exercises[exercicioAtualIndex].sets.push({ weight_kg: parseFloat(kgClean), reps: parseInt(repsClean) });
+            
+            const ex = treinoAtual.exercises[exercicioAtualIndex];
+            ex.sets.push({ weight_kg: parseFloat(kgClean), reps: parseInt(repsClean) });
+            
+            if (ex.rest_seconds && ex.rest_seconds > 0) startRestTimer(ex.rest_seconds);
             guardarEstadoLocal(); renderizarLiveMode();
         }
 
         async function finalizarTreino() {
-            if (!tentarAutoSave()) return; fecharDropdown();
+            if (!tentarAutoSave()) return; fecharDropdown(); fecharRestTimer();
             try {
-                const dados = { routine_name: treinoAtual.routine_name, exercises: treinoAtual.exercises.map(ex => ({ name: ex.name, target_sets: ex.target_sets, sets: ex.sets })) };
-                const response = await fetch(`${API_URL}/treinos/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados) });
+                let duration = treinoAtual.duration_seconds || 0;
+                
+                if (!editandoTreinoId && workoutStartTime) { 
+                    duration = Math.floor((Date.now() - workoutStartTime) / 1000); clearInterval(workoutTimerInterval); 
+                }
+                
+                const dados = { routine_name: treinoAtual.routine_name, duration_seconds: duration, exercises: treinoAtual.exercises.map(ex => ({ name: ex.name, target_sets: ex.target_sets, sets: ex.sets })) };
+                
+                let endpoint = `${API_URL}/treinos/`; let method = 'POST';
+                if (editandoTreinoId) { endpoint = `${API_URL}/treinos/${editandoTreinoId}`; method = 'PUT'; }
+
+                const response = await fetch(endpoint, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados) });
                 if(!response.ok) { showToast("Erro ao gravar no servidor", "❌"); return; }
-                localStorage.removeItem('treinoEmCurso'); showToast("Treino finalizado!", "🎉"); voltarHome();
+                
+                localStorage.removeItem('treinoEmCurso'); showToast(method === 'PUT' ? "Treino atualizado!" : "Treino finalizado!", "🎉"); editandoTreinoId = null; voltarHome();
             } catch (error) { showToast("Sem ligação. Treino guardado localmente.", "📡"); }
         }
 
-        // ======= HISTÓRICO E CALENDÁRIO =======
+        // ======= HISTÓRICO E EDIÇÃO DO HISTÓRICO =======
+        function formatHistoryDuration(seconds) {
+            if(!seconds || seconds <= 0) return '--';
+            let h = Math.floor(seconds / 3600); let m = Math.floor((seconds % 3600) / 60);
+            if(h > 0) return `${h}h ${m}m`; return `${m}m`;
+        }
+
         function setHistoricoModo(modo) {
-            document.getElementById('btnHistLista').style.background = modo === 'lista' ? 'var(--primary)' : 'transparent';
-            document.getElementById('btnHistLista').style.color = modo === 'lista' ? 'white' : 'var(--mut)';
-            document.getElementById('btnHistCal').style.background = modo === 'calendario' ? 'var(--primary)' : 'transparent';
-            document.getElementById('btnHistCal').style.color = modo === 'calendario' ? 'white' : 'var(--mut)';
-            document.getElementById('viewHistoricoLista').style.display = modo === 'lista' ? 'block' : 'none';
-            document.getElementById('viewHistoricoCal').style.display = modo === 'calendario' ? 'block' : 'none';
+            document.getElementById('btnHistLista').style.background = modo === 'lista' ? 'var(--primary)' : 'transparent'; document.getElementById('btnHistLista').style.color = modo === 'lista' ? 'white' : 'var(--mut)';
+            document.getElementById('btnHistCal').style.background = modo === 'calendario' ? 'var(--primary)' : 'transparent'; document.getElementById('btnHistCal').style.color = modo === 'calendario' ? 'white' : 'var(--mut)';
+            document.getElementById('viewHistoricoLista').style.display = modo === 'lista' ? 'block' : 'none'; document.getElementById('viewHistoricoCal').style.display = modo === 'calendario' ? 'block' : 'none';
             if (modo === 'calendario') renderizarCalendario();
         }
 
         async function abrirHistorico() {
-            mostrarEcra('screen-history');
-            const lista = document.getElementById('viewHistoricoLista');
+            mostrarEcra('screen-history'); const lista = document.getElementById('viewHistoricoLista');
             try {
-                const response = await fetch(`${API_URL}/treinos/`);
-                todosTreinosHistorico = await response.json();
+                todosTreinosHistorico = await (await fetch(`${API_URL}/treinos/`)).json();
                 lista.innerHTML = todosTreinosHistorico.length === 0 ? '<p style="color: var(--mut); text-align:center; padding: 20px;">Nenhum treino registado.</p>' : '';
-                
                 todosTreinosHistorico.forEach((t, index) => {
-                    const dataObj = new Date(t.date);
-                    const dataF = dataObj.toLocaleDateString('pt-PT') + ' ' + dataObj.getHours() + ':' + String(dataObj.getMinutes()).padStart(2, '0');
+                    const dataF = new Date(t.date).toLocaleDateString('pt-PT') + ' ' + new Date(t.date).getHours() + ':' + String(new Date(t.date).getMinutes()).padStart(2, '0');
                     let totalSets = t.exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
-                    lista.innerHTML += `
-                        <div class="card" onclick="abrirDetalheTreino(${index})" style="border-left: 4px solid var(--primary); cursor: pointer;">
-                            <div style="display: flex; justify-content: space-between; align-items:center;">
-                                <h3 style="margin: 0; font-size:18px;">${t.routine_name}</h3>
-                                <span style="font-size: 13px; color: var(--mut); font-weight:600;">${dataF}</span>
-                            </div>
-                            <p style="font-size: 14px; color: #ccc; margin: 12px 0 0 0; font-weight:500;">${t.exercises.length} exercícios <span style="color:#666;">•</span> ${totalSets} séries</p>
-                        </div>`;
+                    let durTxt = formatHistoryDuration(t.duration_seconds); 
+                    lista.innerHTML += `<div class="card" onclick="abrirTreinosDoDia([${index}])" style="border-left: 4px solid var(--primary); cursor: pointer;"><div style="display: flex; justify-content: space-between; align-items:center;"><h3 style="margin: 0; font-size:18px;">${t.routine_name}</h3><span style="font-size: 13px; color: var(--mut); font-weight:600;">${dataF}</span></div><p style="font-size: 14px; color: #ccc; margin: 12px 0 0 0; font-weight:500;">${t.exercises.length} exercícios <span style="color:#666;">•</span> ⏱️ ${durTxt}</p></div>`;
                 });
                 renderizarCalendario(); 
             } catch (e) { lista.innerHTML = '<p style="color: var(--danger); text-align:center;">Erro ao carregar histórico.</p>'; }
         }
 
-        function abrirDetalheTreino(index) {
-            const treino = todosTreinosHistorico[index];
-            const dataObj = new Date(treino.date);
-            document.getElementById('detalheTreinoTitulo').innerText = treino.routine_name;
-            document.getElementById('detalheTreinoData').innerText = dataObj.toLocaleDateString('pt-PT') + ' às ' + dataObj.getHours() + ':' + String(dataObj.getMinutes()).padStart(2, '0');
-            
+        async function apagarTreinoHistorico(idx) {
+            fecharDetalheTreino();
+            if(await uiConfirm("Eliminar Treino?", "Este treino desaparecerá do teu histórico e gráficos.", "Eliminar", true)) {
+                let id = todosTreinosHistorico[idx].id;
+                try { await fetch(`${API_URL}/treinos/${id}`, { method: 'DELETE' }); showToast("Treino eliminado", "🗑️"); abrirHistorico(); } catch(e) { showToast("Erro de ligação", "❌"); }
+            }
+        }
+
+        function editarTreinoHistorico(idx) {
+            fecharDetalheTreino(); let t = todosTreinosHistorico[idx]; editandoTreinoId = t.id; 
+            treinoAtual = JSON.parse(JSON.stringify(t)); exercicioAtualIndex = 0;
+            mostrarEcra('screen-live'); document.getElementById('liveTitle').innerText = "A Editar: " + t.routine_name;
+            if(workoutTimerInterval) clearInterval(workoutTimerInterval);
+            document.getElementById('workoutTimerDisplay').innerText = formatTime(t.duration_seconds || 0);
+            renderizarLiveMode();
+        }
+
+        function abrirTreinosDoDia(indices) {
+            if(!indices || indices.length === 0) return;
+            const dataObj = new Date(todosTreinosHistorico[indices[0]].date);
+            let dataFormatada = dataObj.toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' });
+            document.getElementById('detalheTreinoTitulo').innerText = indices.length > 1 ? "Treinos do Dia" : "Treino"; document.getElementById('detalheTreinoData').innerText = dataFormatada.charAt(0).toUpperCase() + dataFormatada.slice(1);
             let html = '';
-            treino.exercises.forEach(ex => {
-                let setsHtml = ex.sets.map((s, i) => `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px; color:#ddd;"><span style="color:var(--mut);">Série ${i+1}</span> <strong>${s.weight_kg}kg x ${s.reps}</strong></div>`).join('');
-                if (ex.sets.length === 0) setsHtml = '<p style="color:var(--mut); font-size:13px; margin:0;">Nenhuma série registada.</p>';
+            indices.forEach((idx, i) => {
+                const treino = todosTreinosHistorico[idx];
+                const hora = new Date(treino.date).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+                let durText = formatHistoryDuration(treino.duration_seconds);
+                
                 html += `
-                    <div style="background:#2c2c2e; padding:12px; border-radius:10px; margin-bottom:12px;">
-                        <h4 style="margin: 0 0 10px 0; color:white;">${ex.name}</h4>
-                        ${setsHtml}
-                    </div>
-                `;
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin: ${i===0?'0':'25px'} 0 10px 0;">
+                        <div>
+                            <h3 style="color:var(--primary); margin:0; font-size:18px;">${treino.routine_name} <span style="color:var(--mut); font-size:13px; font-weight:normal; margin-left: 10px;">⏱️ ${durText}</span></h3>
+                            <span style="font-size:13px; color:var(--mut);">${hora}</span>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="editarTreinoHistorico(${idx})" style="background: #2c2c2e; color: white; width: 35px; height: 35px; padding: 0; border-radius: 8px; font-size: 16px;">✏️</button>
+                            <button onclick="apagarTreinoHistorico(${idx})" style="background: rgba(255, 69, 58, 0.15); color: var(--danger); width: 35px; height: 35px; padding: 0; border-radius: 8px; font-size: 16px;">🗑️</button>
+                        </div>
+                    </div>`;
+                
+                treino.exercises.forEach(ex => {
+                    let setsHtml = ex.sets.map((s, i) => `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px; color:#ddd;"><span style="color:var(--mut);">Série ${i+1}</span> <strong>${s.weight_kg}kg x ${s.reps}</strong></div>`).join('');
+                    if (ex.sets.length === 0) setsHtml = '<p style="color:var(--mut); font-size:13px; margin:0;">Nenhuma série registada.</p>';
+                    html += `<div style="background:#2c2c2e; padding:12px; border-radius:10px; margin-bottom:12px;"><h4 style="margin: 0 0 10px 0; color:white; font-size:15px;">${ex.name}</h4>${setsHtml}</div>`;
+                });
+                if (i < indices.length - 1) html += `<div style="height: 1px; background: #3a3a3c; margin: 20px 0;"></div>`;
             });
-            document.getElementById('detalheTreinoCorpo').innerHTML = html;
-            document.getElementById('modalDetalheTreino').style.display = 'flex';
+            document.getElementById('detalheTreinoCorpo').innerHTML = html; document.getElementById('modalDetalheTreino').style.display = 'flex';
         }
         function fecharDetalheTreino() { document.getElementById('modalDetalheTreino').style.display = 'none'; }
 
         function mudarMes(direcao) { currentCalDate.setMonth(currentCalDate.getMonth() + direcao); renderizarCalendario(); }
-
         function renderizarCalendario() {
-            const container = document.getElementById('calDias');
-            const mesNome = currentCalDate.toLocaleString('pt-PT', { month: 'long', year: 'numeric' });
-            document.getElementById('calMesAno').innerText = mesNome.charAt(0).toUpperCase() + mesNome.slice(1);
+            const container = document.getElementById('calDias'); const mesNome = currentCalDate.toLocaleString('pt-PT', { month: 'long', year: 'numeric' }); document.getElementById('calMesAno').innerText = mesNome.charAt(0).toUpperCase() + mesNome.slice(1);
             container.innerHTML = '';
-            
-            const ano = currentCalDate.getFullYear(); const mes = currentCalDate.getMonth();
-            const primeiroDia = new Date(ano, mes, 1).getDay();
-            const diasNoMes = new Date(ano, mes + 1, 0).getDate();
-            
+            const ano = currentCalDate.getFullYear(); const mes = currentCalDate.getMonth(); const primeiroDia = new Date(ano, mes, 1).getDay(); const diasNoMes = new Date(ano, mes + 1, 0).getDate();
             for (let i = 0; i < primeiroDia; i++) { container.innerHTML += `<div class="cal-day empty"></div>`; }
-            
             const hoje = new Date();
-            
             for (let dia = 1; dia <= diasNoMes; dia++) {
-                const dataAtualLoop = new Date(ano, mes, dia);
-                const isToday = dataAtualLoop.toDateString() === hoje.toDateString();
-                const indexTreino = todosTreinosHistorico.findIndex(t => new Date(t.date).toDateString() === dataAtualLoop.toDateString());
-                const hasWorkout = indexTreino !== -1;
-                
-                let classes = 'cal-day';
-                if (isToday) classes += ' today';
-                if (hasWorkout) classes += ' has-workout';
-                
-                const onClickAction = hasWorkout ? `onclick="abrirDetalheTreino(${indexTreino})"` : '';
-                container.innerHTML += `<div class="${classes}" ${onClickAction}>${dia}</div>`;
+                const dataAtualLoop = new Date(ano, mes, dia); const isToday = dataAtualLoop.toDateString() === hoje.toDateString();
+                const treinosDoDiaIndices = []; todosTreinosHistorico.forEach((t, idx) => { if(new Date(t.date).toDateString() === dataAtualLoop.toDateString()) { treinosDoDiaIndices.push(idx); } });
+                const hasWorkout = treinosDoDiaIndices.length > 0;
+                let classes = 'cal-day' + (isToday ? ' today' : '') + (hasWorkout ? ' has-workout' : '');
+                let dotsHtml = ''; if (hasWorkout) { for(let i=0; i<treinosDoDiaIndices.length; i++) { dotsHtml += `<div class="cal-dot"></div>`; } }
+                const onClickAction = hasWorkout ? `onclick='abrirTreinosDoDia(${JSON.stringify(treinosDoDiaIndices)})'` : '';
+                container.innerHTML += `<div class="${classes}" ${onClickAction}><span>${dia}</span><div class="cal-dots">${dotsHtml}</div></div>`;
             }
         }
 
-        verificarTreinoEmCurso();
-        carregarTemplates();
+        verificarTreinoEmCurso(); carregarTemplates();
     </script>
 </body>
 </html>
